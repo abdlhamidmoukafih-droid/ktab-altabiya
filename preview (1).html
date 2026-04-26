@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الطبيعة أ ربيعة – معاينة مجانية</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a1a0f; --bg2: #0d2214; --page-light: #f5f0e8;
+    --page-mid: #ede5d0; --page-shadow: #c8b99a; --gold: #c9a84c; --gold2: #e8c97a;
+    --green-dark: #1a3d22; --green-mid: #2d6e3e; --text-dark: #1a1208; --spine: #1e4a28;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg); min-height:100vh;
+    font-family:'Cairo',sans-serif; overflow-x:hidden;
+    background-image: radial-gradient(ellipse at 20% 50%, rgba(45,110,62,0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(201,168,76,0.08) 0%, transparent 40%);
+  }
+
+  #langBar {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    padding:10px 20px;
+    background:linear-gradient(to bottom, rgba(10,26,15,0.98), rgba(10,26,15,0));
+  }
+  .lang-btn {
+    padding:6px 16px; border-radius:20px;
+    border:1px solid rgba(201,168,76,0.3); background:rgba(10,26,15,0.8);
+    color:#aaa; font-size:0.8rem; cursor:pointer;
+    font-family:'Cairo',sans-serif; transition:all 0.25s;
+  }
+  .lang-btn.active, .lang-btn:hover { background:var(--gold); color:var(--bg); border-color:var(--gold); font-weight:700; }
+
+  #bookWrap {
+    display:flex; flex-direction:column; align-items:center;
+    justify-content:center; min-height:100vh; padding:70px 20px 80px;
+  }
+  .book-stage { perspective:2000px; width:min(700px,95vw); }
+  .book { width:100%; display:flex; position:relative; transform-style:preserve-3d; }
+  .spine {
+    width:28px; min-height:500px;
+    background:linear-gradient(to right, #0d2010, var(--spine), #1a3d22);
+    border-radius:3px 0 0 3px; display:flex; align-items:center; justify-content:center;
+    box-shadow:-4px 0 12px rgba(0,0,0,0.5); flex-shrink:0;
+  }
+  .spine-text {
+    writing-mode:vertical-rl; color:var(--gold); font-family:'Amiri',serif;
+    font-size:0.7rem; letter-spacing:2px; opacity:0.7; transform:rotate(180deg);
+  }
+  .pages-area { flex:1; position:relative; min-height:500px; }
+  .page {
+    position:absolute; inset:0; background:var(--page-light);
+    border-radius:0 6px 6px 0; padding:36px 32px 28px; overflow:hidden;
+    box-shadow:4px 4px 20px rgba(0,0,0,0.4), inset -2px 0 8px rgba(0,0,0,0.1);
+    display:none; flex-direction:column;
+    animation:pageIn 0.35s ease forwards;
+  }
+  .page.active { display:flex; }
+  .page.cover { background:linear-gradient(135deg, var(--green-dark) 0%, #0f2e18 60%, #1a4a20 100%); }
+  @keyframes pageIn {
+    from { opacity:0; transform:translateX(20px) rotateY(-5deg); }
+    to { opacity:1; transform:translateX(0) rotateY(0); }
+  }
+  .page-line {
+    position:absolute; top:0; right:0; bottom:0; width:2px;
+    background:linear-gradient(to bottom, transparent, rgba(180,160,120,0.3) 20%, rgba(180,160,120,0.3) 80%, transparent);
+  }
+  .cover-ornament { text-align:center; margin-bottom:20px; color:var(--gold); font-size:1.4rem; opacity:0.6; letter-spacing:8px; }
+  .cover-title { font-family:'Amiri',serif; color:var(--gold2); font-size:clamp(1.6rem,5vw,2.4rem); text-align:center; line-height:1.4; margin-bottom:10px; text-shadow:0 0 30px rgba(201,168,76,0.4); }
+  .cover-subtitle { text-align:center; color:rgba(201,168,76,0.6); font-size:0.85rem; letter-spacing:2px; margin-bottom:30px; }
+  .cover-divider { width:60%; height:1px; margin:0 auto 20px; background:linear-gradient(to right, transparent, var(--gold), transparent); }
+  .cover-author { text-align:center; color:var(--gold); font-family:'Amiri',serif; font-size:1rem; margin-bottom:8px; }
+  .cover-badge { background:rgba(201,168,76,0.15); border:1px solid rgba(201,168,76,0.3); border-radius:20px; padding:4px 14px; color:var(--gold); font-size:0.75rem; display:inline-block; margin-top:10px; }
+  .cover-corner { position:absolute; width:50px; height:50px; border-color:rgba(201,168,76,0.3); border-style:solid; }
+  .cover-corner.tl { top:16px; right:16px; border-width:2px 2px 0 0; border-radius:0 4px 0 0; }
+  .cover-corner.tr { top:16px; left:16px; border-width:2px 0 0 2px; border-radius:4px 0 0 0; }
+  .cover-corner.bl { bottom:16px; right:16px; border-width:0 2px 2px 0; border-radius:0 0 4px 0; }
+  .cover-corner.br { bottom:16px; left:16px; border-width:0 0 2px 2px; border-radius:0 0 0 4px; }
+  .page-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; padding-bottom:10px; border-bottom:1px solid rgba(180,160,120,0.3); }
+  .chapter-label { font-size:0.7rem; color:var(--green-mid); letter-spacing:1px; text-transform:uppercase; font-weight:600; }
+  .page-num { font-size:0.7rem; color:var(--page-shadow); }
+  .page-body { flex:1; overflow:hidden; }
+  .chapter-title { font-family:'Amiri',serif; color:var(--green-dark); font-size:clamp(1rem,3vw,1.25rem); margin-bottom:14px; line-height:1.5; border-right:3px solid var(--gold); padding-right:10px; }
+  .page-text { font-family:'Amiri',serif; color:var(--text-dark); font-size:clamp(0.82rem,2vw,0.96rem); line-height:1.9; text-align:justify; }
+  .page-text p { margin-bottom:10px; }
+  .bullet-list { list-style:none; padding:0; margin:8px 0; }
+  .bullet-list li { font-family:'Amiri',serif; color:var(--text-dark); font-size:clamp(0.82rem,2vw,0.94rem); line-height:1.8; padding-right:16px; position:relative; margin-bottom:4px; }
+  .bullet-list li::before { content:'◆'; position:absolute; right:0; color:var(--gold); font-size:0.5rem; top:8px; }
+
+  /* PAYWALL PAGE */
+  .paywall-page {
+    position:absolute; inset:0; background:var(--page-light);
+    border-radius:0 6px 6px 0;
+    display:none; flex-direction:column; align-items:center; justify-content:center;
+    padding:30px; text-align:center;
+    box-shadow:4px 4px 20px rgba(0,0,0,0.4);
+    animation:pageIn 0.35s ease forwards;
+  }
+  .paywall-page.active { display:flex; }
+  .paywall-blur {
+    position:absolute; inset:0;
+    background:linear-gradient(to bottom, transparent 0%, rgba(245,240,232,0.7) 30%, var(--page-light) 60%);
+    border-radius:0 6px 6px 0;
+  }
+  .paywall-content { position:relative; z-index:2; }
+  .paywall-icon { font-size:48px; margin-bottom:12px; }
+  .paywall-title { font-family:'Amiri',serif; color:var(--green-dark); font-size:1.3rem; margin-bottom:8px; }
+  .paywall-sub { color:#666; font-size:0.85rem; line-height:1.6; margin-bottom:20px; }
+  .paywall-btn {
+    display:inline-block; padding:12px 28px;
+    background:linear-gradient(135deg, var(--gold), var(--gold2));
+    color:var(--bg); font-weight:700; font-size:0.95rem;
+    border:none; border-radius:8px; cursor:pointer;
+    font-family:'Cairo',sans-serif; text-decoration:none;
+    transition:opacity 0.2s; margin-bottom:8px;
+  }
+  .paywall-btn:hover { opacity:0.85; }
+  .paywall-price { color:#888; font-size:0.8rem; margin-top:6px; }
+
+  #controls {
+    position:fixed; bottom:0; left:0; right:0;
+    display:flex; align-items:center; justify-content:center; gap:16px;
+    padding:14px 20px;
+    background:linear-gradient(to top, rgba(10,26,15,0.98), rgba(10,26,15,0));
+  }
+  .ctrl-btn {
+    width:48px; height:48px; border-radius:50%;
+    background:rgba(45,110,62,0.3); border:1px solid rgba(201,168,76,0.4);
+    color:var(--gold); font-size:1.2rem; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; transition:all 0.2s;
+  }
+  .ctrl-btn:hover { background:var(--gold); color:var(--bg); border-color:var(--gold); }
+  .ctrl-btn:disabled { opacity:0.3; cursor:default; }
+  .page-indicator { color:rgba(201,168,76,0.6); font-size:0.8rem; min-width:80px; text-align:center; }
+  .book-stage { cursor:pointer; user-select:none; }
+</style>
+</head>
+<body>
+<div id="langBar">
+  <button class="lang-btn active" onclick="setLang('darija',this)">🇲🇦 دارجة</button>
+  <button class="lang-btn" onclick="setLang('arabic',this)">🇸🇦 عربية</button>
+  <button class="lang-btn" onclick="setLang('french',this)">🇫🇷 Français</button>
+  <button class="lang-btn" onclick="setLang('english',this)">🇬🇧 English</button>
+</div>
+
+<div id="bookWrap">
+  <div class="book-stage" id="bookStage">
+    <div class="book">
+      <div class="spine"><div class="spine-text">الطبيعة أ ربيعة • RVR</div></div>
+      <div class="pages-area" id="pagesArea"></div>
+    </div>
+  </div>
+</div>
+
+<div id="controls">
+  <button class="ctrl-btn" id="prevBtn" onclick="changePage(-1)">&#8594;</button>
+  <span class="page-indicator" id="pageIndicator">1 / 1</span>
+  <button class="ctrl-btn" id="nextBtn" onclick="changePage(1)">&#8592;</button>
+</div>
+
+<script>
+let currentPage = 0;
+let currentLang = 'darija';
+const BUY_URL = 'https://paypal.me/AbdlhamidMoukafih/9';
+
+const bookData = {
+  title: { darija:'الطبيعة أ ربيعة', arabic:'الطبيعة يا ربيعة', french:'La Nature, ô Rabia', english:'Nature, O Rabia' },
+  subtitle: { darija:'رحلة فعمق الجينات والمجتمع', arabic:'رحلة في أعماق الجينات والمجتمع', french:'Un voyage au cœur des gènes et de la société', english:'A Journey into Genes and Society' }
+};
+
+const pages = [
+  { type:'cover' },
+  {
+    type:'inner',
+    chapter:{ darija:'المقدمة', arabic:'المقدمة', french:'Introduction', english:'Introduction' },
+    pageNum:1,
+    content:{
+      darija:`<p>أفين، هانية؟ مزيان؟ أش كتعاود؟ كلشي بيخير؟</p>
+<p>وبزاف ديال الحوايج بحال هكا، بالأخص مؤخراً، ولى كيبان ليك كاع الناس صحراوي، مكرّد وكي… فهمتي؟</p>
+<p>ولكن مافيها باس جبدنا هاد الموضوع، أجي نتفلسفو فيه شوية، ما خاسرين والو.</p>
+<p>فهاد السنوات الأخيرة، ولات المثلية الجنسية واحد الموضوع حاضر بقوة فالنقاش العالمي، ولى كيتطرح حتى فالمجتمعات العربية والإسلامية اللي كانت ديما كتشوف فيه تابو وممنوع نهائياً.</p>`,
+      arabic:`<p>كيف حالك يا صديقي؟ كل شيء بخير؟</p>
+<p>في السنوات الأخيرة، أصبحت المثلية الجنسية موضوعاً حاضراً بقوة في النقاش العالمي، وبات يُطرح حتى في المجتمعات العربية والإسلامية التي كانت دوماً تعتبره من المحظورات المطلقة.</p>
+<p>لا بأس، لنتناول هذا الموضوع ونتفلسف فيه قليلاً.</p>`,
+      french:`<p>Alors mon ami, comment ça va ? Tout se passe bien ?</p>
+<p>Ces dernières années, l'homosexualité est devenue un sujet très présent dans le débat mondial, et commence même à être abordée dans les sociétés arabes et islamiques.</p>
+<p>Mais bon, profitons-en pour aborder ce sujet, philosophons un peu.</p>`,
+      english:`<p>Hey, how are you doing? Everything alright?</p>
+<p>In recent years, homosexuality has become a powerfully present topic in global discourse, even being raised in Arab and Islamic societies that always considered it an absolute taboo.</p>
+<p>But that's fine, let's tackle this subject and philosophize a bit.</p>`
+    }
+  },
+  {
+    type:'inner',
+    chapter:{ darija:'الفصل الأول: من الأصل حتى البروستات', arabic:'الفصل الأول', french:'Chapitre 1', english:'Chapter 1' },
+    pageNum:2,
+    content:{
+      darija:`<p class="chapter-title">الفصل الأول: من الأصل حتى البروستات</p>
+<p>نرجعو شوية للّور، نبداو من الأصل. كُلنا كنعرفو أن حنا جينا على تطوُّر.</p>
+<p>عمرك تساءلتي وگلتي: <strong>علاش البروستات جاية جهة الدبر؟</strong></p>
+<p>المسافة بين البروستات والقضيب تقريباً من 5 حتى 7 سم، والمسافة بينها وبين فتحة الدبر تقريباً <strong>2 سم فقط</strong>.</p>
+<p>واش فعلاً هاد الخريطة ماشي صدفة؟ واش تاريخياً كان "الاستعمال الخلفي" حاضر بقوة فالحياة الجنسية ديال المخلوقات؟</p>`,
+      arabic:`<p class="chapter-title">الفصل الأول: من الأصل إلى البروستات</p>
+<p>لنعود قليلاً إلى الوراء. هل تساءلت يوماً: <strong>لماذا تقع البروستات في اتجاه الدبر؟</strong></p>
+<p>المسافة بين البروستات والقضيب تتراوح بين 5 و7 سم، أما المسافة بين البروستات وفتحة الشرج فهي <strong>2 سم فقط</strong>.</p>
+<p>هل هذه الخريطة التشريحية مجرد مصادفة؟</p>`,
+      french:`<p class="chapter-title">Chapitre 1 : De l'origine à la prostate</p>
+<p>Revenons un peu en arrière. T'es-tu jamais demandé : <strong>pourquoi la prostate se trouve-t-elle du côté de l'anus ?</strong></p>
+<p>La distance entre la prostate et le pénis est d'environ 5 à 7 cm, mais la distance entre elle et l'anus est de seulement <strong>2 cm</strong>.</p>
+<p>Cette carte anatomique est-elle vraiment une coïncidence ?</p>`,
+      english:`<p class="chapter-title">Chapter 1: From Origins to the Prostate</p>
+<p>Let's go back a little. Have you ever asked yourself: <strong>why is the prostate located near the anus?</strong></p>
+<p>The distance between the prostate and penis is approximately 5 to 7 cm, but the distance between it and the anus is only <strong>2 cm</strong>.</p>
+<p>Is this anatomical map really just a coincidence?</p>`
+    }
+  },
+  {
+    type:'inner',
+    chapter:{ darija:'الفصل الثاني: الجينات والأحاسيس', arabic:'الفصل الثاني', french:'Chapitre 2', english:'Chapter 2' },
+    pageNum:3,
+    content:{
+      darija:`<p class="chapter-title">الفصل الثاني: الجينات، الأحاسيس، والحكم الاجتماعي</p>
+<p>الدوبامين هو اللي كيتفرز فاش كتعيش متعة. دماغك كيدير واحد الرابط:</p>
+<p style="text-align:center;font-style:italic;color:#2d6e3e;margin:12px 0;">"اللي كيجيب ليا هاد الشعور = حاجة زوينة = نعاودها"</p>
+<p>فاش هاد الحكم الاجتماعي كيجي قدام الجينات ديالك، كيتولد صراع: جينات كتدفع، عقيدة كتكبح، والإنسان فالنص.</p>
+<p>هادشي اللي بغيتك تفهمو: <strong>الشذوذ الحقيقي ماشي أنك كتحس بميول مختلف…</strong></p>
+<p style="text-align:center;color:#888;font-style:italic;">← اقرأ الكتاب الكامل باش تعرف الباقي</p>`,
+      arabic:`<p class="chapter-title">الفصل الثاني: الجينات والأحاسيس والحكم الاجتماعي</p>
+<p>الدوبامين يُفرز حين تعيش متعة. دماغك يصنع رابطاً:</p>
+<p style="text-align:center;font-style:italic;color:#2d6e3e;margin:12px 0;">"ما يمنحني هذا الشعور = شيء جيد = أريد تكراره"</p>
+<p>حين يصطدم هذا الحكم الاجتماعي بجيناتك، يُولد صراعاً عميقاً.</p>
+<p>والشذوذ الحقيقي؟ <strong>ليس ما تظن...</strong></p>
+<p style="text-align:center;color:#888;font-style:italic;">← اقرأ الكتاب الكامل لمعرفة الباقي</p>`,
+      french:`<p class="chapter-title">Chapitre 2 : Les gènes, les sensations et le jugement social</p>
+<p>La dopamine est sécrétée quand on vit du plaisir. Ton cerveau crée un lien :</p>
+<p style="text-align:center;font-style:italic;color:#2d6e3e;margin:12px 0;">"Ce qui me donne cette sensation = quelque chose de bien = je veux le répéter"</p>
+<p>Et la vraie déviance ? <strong>Ce n'est pas ce que tu crois...</strong></p>
+<p style="text-align:center;color:#888;font-style:italic;">← Lis le livre complet pour savoir la suite</p>`,
+      english:`<p class="chapter-title">Chapter 2: Genes, Feelings, and Social Judgment</p>
+<p>Dopamine is released when you experience pleasure. Your brain creates a link:</p>
+<p style="text-align:center;font-style:italic;color:#2d6e3e;margin:12px 0;">"What gives me this feeling = something good = I want to repeat it"</p>
+<p>And the real deviance? <strong>It's not what you think...</strong></p>
+<p style="text-align:center;color:#888;font-style:italic;">← Read the full book to find out the rest</p>`
+    }
+  },
+  { type:'paywall' }
+];
+
+function renderPage(idx) {
+  const p = pages[idx];
+  const area = document.getElementById('pagesArea');
+  area.querySelectorAll('.page,.paywall-page').forEach(el => el.classList.remove('active'));
+  let el = area.querySelector(`[data-page="${idx}"]`);
+  if (!el) { el = document.createElement('div'); el.dataset.page = idx; area.appendChild(el); }
+
+  if (p.type === 'cover') {
+    el.className = 'page cover active';
+    el.innerHTML = `
+      <div class="cover-corner tl"></div><div class="cover-corner tr"></div>
+      <div class="cover-corner bl"></div><div class="cover-corner br"></div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 10px;">
+        <div class="cover-ornament">◈ ◇ ◈</div>
+        <div class="cover-title">${bookData.title[currentLang]}</div>
+        <div class="cover-subtitle">${bookData.subtitle[currentLang]}</div>
+        <div class="cover-divider"></div>
+        <div style="width:60px;height:60px;margin:0 auto 20px;opacity:0.4;">
+          <svg viewBox="0 0 60 60" fill="none"><circle cx="30" cy="30" r="28" stroke="#c9a84c" stroke-width="1"/>
+          <path d="M20 30 Q30 15 40 30 Q30 45 20 30Z" stroke="#c9a84c" stroke-width="1" fill="none"/></svg>
+        </div>
+        <div class="cover-author">بقلم RVR & Abdo Moka</div>
+        <div class="cover-badge">📖 معاينة مجانية</div>
+      </div>
+      <div class="page-line"></div>
+    `;
+  } else if (p.type === 'paywall') {
+    el.className = 'paywall-page active';
+    const msgs = {
+      darija: { title:'هنا توقفنا… 🔒', sub:'الكتاب الكامل فيه بزاف أكثر:\nالأنواع، المجتمع، الدين، وتصالح مع راسك.', btn:'خود الكتاب الكامل', price:'خلص مرة وقراه للأبد' },
+      arabic: { title:'توقفنا هنا… 🔒', sub:'الكتاب الكامل يحتوي على الكثير:\nالأنواع، المجتمع، الدين، والمصالحة مع الذات.', btn:'احصل على الكتاب الكامل', price:'ادفع مرة واقرأه للأبد' },
+      french: { title:'On s\'arrête ici… 🔒', sub:'Le livre complet contient beaucoup plus:\nles types, la société, la religion, et la réconciliation avec soi.', btn:'Obtenir le livre complet', price:'Paye une fois, lis pour toujours' },
+      english: { title:'We stop here… 🔒', sub:'The full book contains much more:\ntypes, society, religion, and self-reconciliation.', btn:'Get the Full Book', price:'Pay once, read forever' }
+    };
+    const m = msgs[currentLang];
+    el.innerHTML = `
+      <div class="paywall-content">
+        <div class="paywall-icon">📚</div>
+        <div class="paywall-title">${m.title}</div>
+        <div class="paywall-sub">${m.sub.replace(/\n/g,'<br>')}</div>
+        <a href="${BUY_URL}" target="_blank" class="paywall-btn">${m.btn}</a>
+        <div class="paywall-price">${m.price}</div>
+      </div>
+      <div class="page-line"></div>
+    `;
+  } else {
+    el.className = 'page active';
+    el.innerHTML = `
+      <div class="page-header">
+        <span class="chapter-label">${p.chapter[currentLang]}</span>
+        <span class="page-num">${p.pageNum}</span>
+      </div>
+      <div class="page-body">
+        <div class="page-text">${p.content[currentLang]}</div>
+      </div>
+      <div class="page-line"></div>
+    `;
+  }
+  document.getElementById('prevBtn').disabled = idx === 0;
+  document.getElementById('nextBtn').disabled = idx === pages.length - 1;
+  document.getElementById('pageIndicator').textContent = `${idx+1} / ${pages.length}`;
+}
+
+function changePage(dir) {
+  const next = currentPage + dir;
+  if (next < 0 || next >= pages.length) return;
+  currentPage = next; renderPage(currentPage);
+}
+
+function setLang(lang, btn) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.documentElement.dir = (lang==='french'||lang==='english') ? 'ltr' : 'rtl';
+  renderPage(currentPage);
+}
+
+renderPage(0);
+
+let startX = 0;
+document.getElementById('bookStage').addEventListener('touchstart', e => { startX = e.touches[0].clientX; });
+document.getElementById('bookStage').addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - startX;
+  if (Math.abs(dx) > 40) changePage(dx < 0 ? 1 : -1);
+});
+</script>
+</body>
+</html>
