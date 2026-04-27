@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin – الطبيعة أ ربيعة</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body {
+  background: #0a1a0f;
+  min-height: 100vh;
+  font-family: 'Cairo', sans-serif;
+  color: #e0f2e9;
+  padding: 20px;
+}
+.header {
+  text-align: center;
+  padding: 24px 0 16px;
+  border-bottom: 1px solid rgba(64,145,108,0.3);
+  margin-bottom: 24px;
+}
+.header h1 { color: #52b788; font-size: 1.5rem; margin-bottom: 4px; }
+.header p { color: #6c8f7a; font-size: 0.82rem; }
+
+/* LOGIN */
+#loginSection {
+  max-width: 360px; margin: 60px auto;
+  background: #0d2b1a; border: 1px solid rgba(64,145,108,0.2);
+  border-radius: 12px; padding: 32px; text-align: center;
+}
+#loginSection h2 { color: #52b788; margin-bottom: 20px; font-size: 1.2rem; }
+#loginSection input {
+  width: 100%; padding: 12px; background: #0a1a0f;
+  border: 1px solid rgba(64,145,108,0.3); border-radius: 8px;
+  color: #e0f2e9; font-size: 1rem; text-align: center;
+  letter-spacing: 3px; direction: ltr; outline: none;
+  font-family: 'Cairo', sans-serif; margin-bottom: 12px;
+}
+#loginSection input:focus { border-color: #52b788; }
+#loginSection button {
+  width: 100%; padding: 12px;
+  background: linear-gradient(135deg, #1b4332, #2d8653);
+  color: #fff; font-weight: 700; border: none; border-radius: 8px;
+  cursor: pointer; font-family: 'Cairo', sans-serif; font-size: 1rem;
+}
+.login-err { color: #ff6b6b; font-size: 0.82rem; margin-top: 8px; }
+
+/* MAIN */
+#mainSection { display: none; max-width: 700px; margin: 0 auto; }
+
+.card {
+  background: #0d2b1a;
+  border: 1px solid rgba(64,145,108,0.2);
+  border-radius: 12px; padding: 20px; margin-bottom: 16px;
+}
+.card h2 { color: #52b788; font-size: 1rem; margin-bottom: 14px; }
+
+/* GENERATE */
+.gen-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+.gen-row label { color: #6c8f7a; font-size: 0.82rem; white-space: nowrap; }
+.gen-row input[type=number] {
+  width: 70px; padding: 8px 10px; background: #0a1a0f;
+  border: 1px solid rgba(64,145,108,0.3); border-radius: 6px;
+  color: #e0f2e9; font-size: 0.9rem; text-align: center;
+  direction: ltr; outline: none; font-family: 'Cairo', sans-serif;
+}
+.btn-green {
+  padding: 10px 20px; background: linear-gradient(135deg, #1b4332, #2d8653);
+  color: #fff; font-weight: 700; border: none; border-radius: 8px;
+  cursor: pointer; font-family: 'Cairo', sans-serif; font-size: 0.9rem;
+  transition: opacity 0.2s;
+}
+.btn-green:hover { opacity: 0.85; }
+.btn-red {
+  padding: 8px 16px; background: rgba(220,50,50,0.2);
+  color: #ff8888; font-weight: 600; border: 1px solid rgba(220,50,50,0.3);
+  border-radius: 6px; cursor: pointer; font-family: 'Cairo', sans-serif;
+  font-size: 0.82rem;
+}
+.btn-copy {
+  padding: 6px 12px; background: rgba(64,145,108,0.15);
+  color: #52b788; border: 1px solid rgba(64,145,108,0.3);
+  border-radius: 6px; cursor: pointer; font-size: 0.78rem;
+  font-family: 'Cairo', sans-serif;
+}
+.btn-copy:hover { background: rgba(64,145,108,0.3); }
+
+/* CODES TABLE */
+.codes-table { width: 100%; border-collapse: collapse; }
+.codes-table th {
+  text-align: right; color: #52b788; font-size: 0.75rem;
+  padding: 8px 10px; border-bottom: 1px solid rgba(64,145,108,0.2);
+  font-weight: 600; letter-spacing: 0.5px;
+}
+.codes-table td {
+  padding: 10px; border-bottom: 1px solid rgba(64,145,108,0.1);
+  font-size: 0.82rem; color: #b0d4be;
+}
+.codes-table tr:hover td { background: rgba(64,145,108,0.05); }
+.code-val {
+  font-family: monospace; font-size: 0.95rem;
+  color: #e0f2e9; letter-spacing: 2px; direction: ltr;
+}
+.badge {
+  display: inline-block; padding: 2px 8px; border-radius: 10px;
+  font-size: 0.72rem; font-weight: 700;
+}
+.badge-new { background: rgba(64,145,108,0.2); color: #52b788; }
+.badge-used { background: rgba(220,50,50,0.15); color: #ff8888; }
+
+/* STATS */
+.stats-row { display: flex; gap: 12px; flex-wrap: wrap; }
+.stat-box {
+  flex: 1; min-width: 100px; background: rgba(64,145,108,0.08);
+  border: 1px solid rgba(64,145,108,0.15); border-radius: 8px;
+  padding: 14px; text-align: center;
+}
+.stat-num { font-size: 1.8rem; font-weight: 900; color: #52b788; }
+.stat-label { font-size: 0.72rem; color: #6c8f7a; margin-top: 2px; }
+
+/* EMPTY */
+.empty { text-align: center; color: #4a7a5a; padding: 24px; font-size: 0.85rem; }
+
+/* TOAST */
+.toast {
+  position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+  background: #1b4332; color: #e0f2e9; padding: 10px 20px;
+  border-radius: 8px; font-size: 0.85rem; opacity: 0;
+  transition: opacity 0.3s; pointer-events: none; z-index: 999;
+  border: 1px solid rgba(64,145,108,0.3);
+}
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div id="loginSection">
+  <h2>🔐 Admin Panel</h2>
+  <p style="color:#6c8f7a;font-size:0.82rem;margin-bottom:16px">الطبيعة أ ربيعة</p>
+  <input type="password" id="adminPwd" placeholder="كلمة السر" maxlength="20">
+  <button onclick="adminLogin()">دخول</button>
+  <div class="login-err" id="loginErr"></div>
+</div>
+
+<div id="mainSection">
+  <div class="header">
+    <h1>📊 Admin Panel – الطبيعة أ ربيعة</h1>
+    <p>إدارة كودات الدخول للكتاب الكامل</p>
+  </div>
+
+  <!-- STATS -->
+  <div class="card">
+    <h2>📈 الإحصائيات</h2>
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-num" id="statTotal">0</div><div class="stat-label">كل الكودات</div></div>
+      <div class="stat-box"><div class="stat-num" id="statNew">0</div><div class="stat-label">غير مستعملة</div></div>
+      <div class="stat-box"><div class="stat-num" id="statUsed">0</div><div class="stat-label">مستعملة</div></div>
+    </div>
+  </div>
+
+  <!-- GENERATE -->
+  <div class="card">
+    <h2>➕ ولد كودات جديدة</h2>
+    <div class="gen-row">
+      <label>عدد الكودات:</label>
+      <input type="number" id="genCount" value="1" min="1" max="50">
+      <button class="btn-green" onclick="generateCodes()">ولد</button>
+    </div>
+    <div id="newCodesArea" style="display:none">
+      <div style="color:#6c8f7a;font-size:0.78rem;margin-bottom:6px">الكودات الجديدة (كوبي وبعثها للزبائن):</div>
+      <div id="newCodesList" style="background:#0a1a0f;border:1px solid rgba(64,145,108,0.2);border-radius:8px;padding:12px;font-family:monospace;font-size:0.95rem;direction:ltr;letter-spacing:2px;line-height:2;color:#e0f2e9"></div>
+      <button class="btn-copy" style="margin-top:8px" onclick="copyNewCodes()">📋 كوبي الكل</button>
+    </div>
+  </div>
+
+  <!-- CODES LIST -->
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h2 style="margin:0">📋 كل الكودات</h2>
+      <button class="btn-red" onclick="clearAllCodes()">🗑 مسح الكل</button>
+    </div>
+    <div id="codesContainer">
+      <div class="empty">ما كاين حتى كود بعد</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ADMIN_PWD = "RVR@admin2025";
+const STORAGE_KEY = "rvr_codes_admin";
+
+function adminLogin() {
+  const pwd = document.getElementById('adminPwd').value;
+  if (pwd === ADMIN_PWD) {
+    document.getElementById('loginSection').style.display = 'none';
+    document.getElementById('mainSection').style.display = 'block';
+    loadCodes();
+  } else {
+    document.getElementById('loginErr').textContent = '❌ كلمة السر غلط';
+  }
+}
+document.getElementById('adminPwd').addEventListener('keydown', e => {
+  if (e.key === 'Enter') adminLogin();
+});
+
+function getCodes() {
+  return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+}
+function saveCodes(codes) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(codes));
+  // Also sync to book's code list
+  const codeVals = codes.map(c => c.code);
+  localStorage.setItem('rvr_codes', JSON.stringify(codeVals));
+}
+
+function genCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = 'RVR';
+  for (let i = 0; i < 5; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+function generateCodes() {
+  const count = parseInt(document.getElementById('genCount').value) || 1;
+  const codes = getCodes();
+  const newCodes = [];
+  
+  for (let i = 0; i < count; i++) {
+    let code;
+    do { code = genCode(); } while (codes.find(c => c.code === code));
+    const entry = { code, used: false, created: new Date().toLocaleDateString('ar-MA') };
+    codes.push(entry);
+    newCodes.push(code);
+  }
+  
+  saveCodes(codes);
+  
+  document.getElementById('newCodesList').textContent = newCodes.join('\n');
+  document.getElementById('newCodesArea').style.display = 'block';
+  
+  loadCodes();
+  showToast(`✅ تم توليد ${count} كود`);
+}
+
+function copyNewCodes() {
+  const text = document.getElementById('newCodesList').textContent;
+  navigator.clipboard.writeText(text).then(() => showToast('📋 تم الكوبي!'));
+}
+
+function copyCode(code) {
+  navigator.clipboard.writeText(code).then(() => showToast(`📋 كوبي: ${code}`));
+}
+
+function markUsed(code) {
+  const codes = getCodes();
+  const c = codes.find(c => c.code === code);
+  if (c) { c.used = true; saveCodes(codes); loadCodes(); }
+}
+
+function deleteCode(code) {
+  const codes = getCodes().filter(c => c.code !== code);
+  saveCodes(codes);
+  loadCodes();
+  showToast('🗑 تم المسح');
+}
+
+function clearAllCodes() {
+  if (confirm('واش متأكد تمسح كل الكودات؟')) {
+    saveCodes([]);
+    loadCodes();
+    showToast('🗑 مسحنا كل الكودات');
+  }
+}
+
+function loadCodes() {
+  const codes = getCodes();
+  const total = codes.length;
+  const used = codes.filter(c => c.used).length;
+  const newc = total - used;
+  
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statNew').textContent = newc;
+  document.getElementById('statUsed').textContent = used;
+  
+  const container = document.getElementById('codesContainer');
+  if (total === 0) {
+    container.innerHTML = '<div class="empty">ما كاين حتى كود بعد</div>';
+    return;
+  }
+  
+  let html = `<table class="codes-table">
+    <thead><tr>
+      <th>الكود</th>
+      <th>الحالة</th>
+      <th>تاريخ التوليد</th>
+      <th>إجراءات</th>
+    </tr></thead><tbody>`;
+  
+  codes.slice().reverse().forEach(c => {
+    html += `<tr>
+      <td><span class="code-val">${c.code}</span></td>
+      <td><span class="badge ${c.used ? 'badge-used' : 'badge-new'}">${c.used ? 'مستعمل' : 'جديد'}</span></td>
+      <td>${c.created}</td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap">
+        <button class="btn-copy" onclick="copyCode('${c.code}')">📋 كوبي</button>
+        ${!c.used ? `<button class="btn-copy" onclick="markUsed('${c.code}')" style="color:#f0a070;border-color:rgba(240,160,112,0.3)">✓ مستعمل</button>` : ''}
+        <button class="btn-red" onclick="deleteCode('${c.code}')">🗑</button>
+      </td>
+    </tr>`;
+  });
+  
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>

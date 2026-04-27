@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الطبيعة أ ربيعة</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#d4ede0; --page:#ffffff; --page2:#e0f2e9;
+  --text:#0a1a0f; --text2:#1b4332;
+  --accent:#1b5e3b; --accent2:#2d8653;
+  --gold:#1b5e3b; --border:rgba(27,94,59,0.3);
+  --spine:#0d2b1a;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);min-height:100vh;font-family:'Cairo',sans-serif;
+  background-image:radial-gradient(ellipse at 15% 25%,rgba(124,74,30,0.06) 0%,transparent 50%),
+  radial-gradient(ellipse at 85% 75%,rgba(58,107,74,0.04) 0%,transparent 50%);}
+
+#accessModal{position:fixed;inset:0;z-index:1000;background:rgba(237,232,220,0.96);
+  display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+.modal-box{background:var(--page);border:1px solid var(--border);border-radius:16px;
+  padding:40px 32px;max-width:400px;width:90%;text-align:center;
+  box-shadow:0 8px 40px rgba(124,74,30,0.1);}
+.modal-icon{font-size:52px;margin-bottom:14px;}
+.modal-box h2{font-family:'Amiri',serif;color:var(--text);font-size:1.7rem;margin-bottom:6px;}
+.modal-sub{color:var(--text2);font-size:0.85rem;margin-bottom:20px;line-height:1.6;}
+.modal-box input{width:100%;padding:13px 18px;background:var(--page2);
+  border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:1.1rem;
+  text-align:center;letter-spacing:4px;font-family:'Cairo',sans-serif;outline:none;
+  margin-bottom:12px;transition:border-color 0.3s;direction:ltr;}
+.modal-box input:focus{border-color:var(--accent);}
+.modal-box button{width:100%;padding:13px;
+  background:linear-gradient(135deg,#1b4332,#40916c);
+  color:#fff;font-weight:700;font-size:1rem;border:none;border-radius:8px;cursor:pointer;
+  font-family:'Cairo',sans-serif;transition:opacity 0.2s;}
+.modal-box button:hover{opacity:0.85;}
+.modal-error{color:#c0392b;font-size:0.85rem;margin-top:8px;min-height:20px;}
+
+#langBar{position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;
+  background:linear-gradient(to bottom,rgba(237,232,220,0.98),transparent);}
+.lang-btn{padding:5px 14px;border-radius:20px;border:1px solid var(--border);
+  background:rgba(250,247,241,0.9);color:var(--text2);font-size:0.78rem;cursor:pointer;
+  font-family:'Cairo',sans-serif;transition:all 0.25s;}
+.lang-btn.active,.lang-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700;}
+
+#bookWrap{display:flex;flex-direction:column;align-items:center;
+  justify-content:center;min-height:100vh;padding:70px 16px 80px;}
+.book-stage{perspective:2000px;width:min(700px,95vw);}
+.book{width:100%;display:flex;}
+.spine{width:26px;min-height:540px;
+  background:linear-gradient(to right,#040d08,#1b4332,#2d6a4f);
+  border-radius:3px 0 0 3px;display:flex;align-items:center;justify-content:center;
+  box-shadow:-3px 0 10px rgba(0,0,0,0.15);flex-shrink:0;}
+.spine-text{writing-mode:vertical-rl;color:rgba(100,220,150,0.5);
+  font-family:'Cairo',sans-serif;font-size:0.62rem;letter-spacing:2px;transform:rotate(180deg);}
+.pages-area{flex:1;position:relative;min-height:540px;}
+
+.page{position:absolute;inset:0;background:var(--page);
+  border-radius:0 8px 8px 0;padding:34px 30px 26px;overflow:hidden;
+  box-shadow:4px 4px 20px rgba(124,74,30,0.12),inset -1px 0 4px rgba(124,74,30,0.05);
+  display:none;flex-direction:column;animation:pageIn 0.3s ease forwards;}
+.page.active{display:flex;}
+.page.cover{background:linear-gradient(145deg,#081c15 0%,#1b4332 55%,#0d2818 100%);}
+.page.back-cover{background:linear-gradient(145deg,#081c15,#0d2818);}
+@keyframes pageIn{from{opacity:0;transform:translateX(12px);}to{opacity:1;transform:translateX(0);}}
+
+/* COVER */
+.cover-wrap{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:20px;position:relative;}
+.cover-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Amiri',serif;font-size:9rem;color:rgba(255,255,255,0.025);overflow:hidden;}
+.cover-tag{background:var(--accent2);color:#fff;font-size:0.68rem;letter-spacing:2px;
+  padding:4px 14px;border-radius:3px;margin-bottom:18px;font-weight:700;}
+.cover-title{font-family:'Amiri',serif;color:#f5e6c8;
+  font-size:clamp(1.9rem,5.5vw,2.8rem);text-align:center;line-height:1.35;margin-bottom:8px;}
+.cover-title span{color:var(--accent2);}
+.cover-sub{color:rgba(245,230,200,0.4);font-size:0.8rem;text-align:center;
+  letter-spacing:1.5px;margin-bottom:24px;}
+.cover-line{width:48px;height:1px;margin:0 auto 18px;
+  background:linear-gradient(to right,transparent,var(--gold),transparent);}
+.cover-author{color:rgba(245,230,200,0.6);font-size:0.88rem;text-align:center;}
+.cover-author span{color:var(--gold);}
+.cover-edition{margin-top:18px;color:rgba(245,230,200,0.2);font-size:0.68rem;letter-spacing:3px;}
+.cover-corner{position:absolute;width:38px;height:38px;
+  border-color:rgba(64,145,108,0.2);border-style:solid;}
+.cover-corner.tl{top:12px;right:12px;border-width:1px 1px 0 0;}
+.cover-corner.tr{top:12px;left:12px;border-width:1px 0 0 1px;}
+.cover-corner.bl{bottom:12px;right:12px;border-width:0 1px 1px 0;}
+.cover-corner.br{bottom:12px;left:12px;border-width:0 0 1px 1px;}
+
+/* INNER */
+.page-header{display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:14px;padding-bottom:9px;border-bottom:1px solid rgba(124,74,30,0.12);}
+.chapter-label{font-size:0.67rem;color:var(--accent);letter-spacing:1px;font-weight:700;}
+.page-num{font-size:0.68rem;color:#bbb;}
+.page-body{flex:1;overflow:hidden;}
+.ch-title{font-family:'Amiri',serif;color:var(--text);font-size:clamp(0.95rem,2.5vw,1.15rem);
+  margin-bottom:12px;line-height:1.5;padding-bottom:8px;border-bottom:2px solid #40916c;}
+.page-text{font-family:'Amiri',serif;color:var(--text);
+  font-size:clamp(0.82rem,1.9vw,0.94rem);line-height:2;text-align:justify;}
+.page-text p{margin-bottom:9px;}
+.hl{background:rgba(45,106,79,0.07);border-right:3px solid #40916c;
+  padding:7px 11px;margin:9px 0;border-radius:0 4px 4px 0;font-style:italic;}
+.bl{list-style:none;padding:0;margin:8px 0;}
+.bl li{font-family:'Amiri',serif;color:var(--text);
+  font-size:clamp(0.82rem,1.9vw,0.93rem);line-height:1.9;
+  padding-right:16px;position:relative;margin-bottom:4px;}
+.bl li::before{content:'';position:absolute;right:3px;top:11px;
+  width:6px;height:6px;border-radius:50%;background:var(--accent);}
+
+/* PAYWALL */
+.paywall-page{position:absolute;inset:0;background:var(--page);
+  border-radius:0 8px 8px 0;display:none;flex-direction:column;
+  align-items:center;justify-content:center;padding:28px 22px;text-align:center;
+  box-shadow:4px 4px 20px rgba(124,74,30,0.12);animation:pageIn 0.3s ease forwards;}
+.paywall-page.active{display:flex;}
+.pw-icon{font-size:44px;margin-bottom:12px;}
+.pw-title{font-family:'Amiri',serif;color:var(--text);font-size:1.3rem;margin-bottom:8px;}
+.pw-sub{color:var(--text2);font-size:0.82rem;line-height:1.7;margin-bottom:16px;}
+.pay-box{width:100%;background:var(--page2);border:1px solid var(--border);
+  border-radius:10px;padding:16px;margin-bottom:10px;}
+.pay-label{font-size:0.7rem;color:var(--accent);font-weight:700;letter-spacing:1px;margin-bottom:8px;}
+.rip-num{background:#fff;border:1px solid var(--border);border-radius:6px;
+  padding:10px 14px;font-family:monospace;font-size:0.85rem;color:var(--text);
+  letter-spacing:1px;direction:ltr;margin-bottom:6px;word-break:break-all;}
+.pay-price{font-size:1.1rem;font-weight:700;color:var(--accent);margin-bottom:4px;}
+.pay-note{font-size:0.74rem;color:#999;line-height:1.5;}
+.divider{color:#ccc;font-size:0.8rem;margin:10px 0;}
+.wa-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;
+  background:#25D366;color:#fff;border-radius:8px;text-decoration:none;
+  font-family:'Cairo',sans-serif;font-weight:700;font-size:0.88rem;transition:opacity 0.2s;}
+.wa-btn:hover{opacity:0.85;}
+
+/* BACK */
+.back-wrap{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:24px;}
+.back-quote{font-family:'Amiri',serif;color:rgba(245,230,200,0.85);
+  font-size:1rem;line-height:2;text-align:center;font-style:italic;
+  padding:18px;border:1px solid rgba(196,135,79,0.2);border-radius:8px;margin-bottom:14px;}
+
+/* CONTROLS */
+#controls{position:fixed;bottom:0;left:0;right:0;
+  display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 20px;
+  background:linear-gradient(to top,rgba(237,232,220,0.98),transparent);}
+.ctrl-btn{width:44px;height:44px;border-radius:50%;
+  background:rgba(45,106,79,0.1);border:1px solid var(--border);
+  color:var(--accent);font-size:1.1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.ctrl-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+.ctrl-btn:disabled{opacity:0.25;cursor:default;}
+.page-indicator{color:var(--text2);font-size:0.76rem;min-width:70px;text-align:center;opacity:0.6;}
+.book-stage{user-select:none;}
+</style>
+</head>
+<body>
+
+<div id="accessModal" style="display:none!important">
+  <div class="modal-box">
+    <div class="modal-icon">📖</div>
+    <h2>الطبيعة أ ربيعة</h2>
+    <div class="modal-sub">رحلة في عمق الجينات والمجتمع<br><small style="color:#aaa">أدخل كود الدخول الخاص بك</small></div>
+    <input type="text" id="codeInput" placeholder="كود الدخول" maxlength="12" dir="ltr">
+    <button onclick="checkCode()">دخول للكتاب</button>
+    <div class="modal-error" id="codeError"></div>
+  </div>
+</div>
+
+<div id="langBar" style="display:none">
+  <button class="lang-btn active" onclick="setLang('d',this)">🇲🇦 دارجة</button>
+  <button class="lang-btn" onclick="setLang('a',this)">🇸🇦 عربية</button>
+  <button class="lang-btn" onclick="setLang('f',this)">🇫🇷 Français</button>
+  <button class="lang-btn" onclick="setLang('e',this)">🇬🇧 English</button>
+</div>
+
+<div id="bookWrap" style="display:none">
+  <div class="book-stage" id="bookStage">
+    <div class="book">
+      <div class="spine"><div class="spine-text">الطبيعة أ ربيعة • RVR & Abdo Moka</div></div>
+      <div class="pages-area" id="pagesArea"></div>
+    </div>
+  </div>
+</div>
+
+<div id="controls" style="display:none">
+  <button class="ctrl-btn" id="prevBtn" onclick="nav('prev')">&#8594;</button>
+  <span class="page-indicator" id="pageInd">1 / 1</span>
+  <button class="ctrl-btn" id="nextBtn" onclick="nav('next')">&#8592;</button>
+</div>
+
+<script>
+const ADMIN_CODE="RVRMASTER2025", RIP="00748000063953004005781", WA="212635924374";
+function isValidCode(v){
+  if(v===ADMIN_CODE)return true;
+  const codes=JSON.parse(localStorage.getItem('rvr_codes')||'[]');
+  return codes.includes(v);
+}
+const FREE=3;
+let pg=0, lang='d', unlocked=false;
+
+const T={
+  cover:{
+    d:['الطبيعة','أ ربيعة','رحلة فعمق الجينات والمجتمع','المثلية • الجينات • المجتمع • التطور'],
+    a:['الطبيعة','يا ربيعة','رحلة في أعماق الجينات والمجتمع','المثلية • الجينات • المجتمع'],
+    f:['La Nature','ô Rabia','Un voyage au cœur des gènes','Homosexualité • Gènes • Société'],
+    e:['Nature,','O Rabia','A Journey into Genes and Society','Homosexuality • Genes • Society']
+  },
+  ch:{
+    mq:{d:'المقدمة',a:'المقدمة',f:'Introduction',e:'Introduction'},
+    c1:{d:'ف1: من الأصل تال البروستات',a:'الفصل الأول',f:'Chapitre 1',e:'Chapter 1'},
+    c2:{d:'ف2: الجانب النفسي',a:'الفصل الثاني',f:'Chapitre 2',e:'Chapter 2'},
+    c3:{d:'ف3: أنواع المثلية',a:'الفصل الثالث',f:'Chapitre 3',e:'Chapter 3'},
+    c4:{d:'ف4: نربطو النقط',a:'الفصل الرابع',f:'Chapitre 4',e:'Chapter 4'},
+    kh:{d:'الخاتمة',a:'الخاتمة',f:'Conclusion',e:'Conclusion'}
+  }
+};
+
+const pages=[
+{type:'cover'},
+
+// MQ1
+{type:'inner',ch:'mq',n:1,c:{
+d:`<p>أفين، هانية؟ مزيان؟ أش كتعاود؟ كلشي بيخير؟ الوالدة، الخوت، كلشي مزيان؟ إيوا الحمد لله.</p>
+<p>داك خونا اللي فيه الصواب بزاف بحال العيالات، هههه، لا غير ضاحكين. داكشي ما عندو حتى علاقة بدوك خوتنا الله ينجينا منهم اللي كيوليو بحال العيالات، كيبقاو بيناتهم: "كيفاش أختي؟"، وهو كيدوي مع عشيرو! زعما شي ناس الله يهديهم. وبلا ما نهدرو على هداك اللي بلحيتو وكي… راك تَمّ، خبار فراسك.</p>
+<p>وبزاف ديال الحوايج بحال هكا، بالأخص مؤخراً، ولى كيبان ليك كاع الناس صحراوي، مكرّد وكي… فهمتي؟ وكتلقى واحد إمام كيعجبوه الدراري! وزيد عليها، حنا عارفين أن الناس كتلقى واحد النوعية كتشابه، ونوعية عاود كتشابه، وكاين عندنا نوعيات خرين، وكتلاحظ فگاع هاد الجينوس كاين فالدومين ديال الگاي. هادشي ماشي نورمال أخويا، فين كنا وفين ولينا!</p>`,
+a:`<p>كيف حالك يا صديقي؟ كل شيء بخير؟ الوالدة والإخوة؟ الحمد لله.</p>
+<p>ذلك أخونا الذي يبالغ في التصرف كالنساء، هههه، لا مجرد ضحك. هذا لا علاقة له بأولئك إخواننا الله ينجينا منهم. وبالإضافة إلى ذلك، نحن نعرف أن الناس تجد أنواعاً متشابهة، وتلاحظ في كل هذه الأنواع أن ثمة شيئاً في مجال "المثلية".</p>`,
+f:`<p>Alors mon ami, comment ça va ? La famille, tout le monde est en bonne santé ? Alhamdulillah.</p>
+<p>Ce frère qui se comporte trop comme une femme, hhhh, on rigole juste. Et on remarque dans tous ces genres qu'il y a quelque chose dans le domaine "gay".</p>`,
+e:`<p>Hey, how are you doing? Family good? Alhamdulillah.</p>
+<p>That brother who acts way too feminine, hahaha, just kidding. And you notice in all these genres that there's something in the "gay" domain.</p>`
+}},
+
+// MQ2
+{type:'inner',ch:'mq',n:2,c:{
+d:`<p>ولكن مافيها باس جبدنا هاد الموضوع، أجي نتفلسفو فيه شوية، ما خاسرين والو. وأنا بيني وبينك داير ليك هاد الدخلة غير باش نجبد معاك هاد الموضوع، أنا ما قصدتك والمقصود الله، ماعليناش، هههه.</p>
+<p>فهاد السنوات الأخيرة، ولات المثلية الجنسية واحد الموضوع حاضر بقوة فالنقاش العالمي، ولى كيتطرح حتى فالمجتمعات العربية والإسلامية اللي كانت ديما كتشوف فيه تابو وممنوع نهائياً. ومع أن القانون فبلدان بحال المغرب مازال كيعاقب على العلاقات المثلية بين الأشخاص من نفس الجنس، إلا أن وجودها فالمجتمع واقع ما يمكنش إنكاره، وكتبان آثاره فالحياة اليومية، فالإعلام، وفنقاشات الشباب فالسوشيال ميديا.</p>
+<p>فهاد الكتاب غادي نحاولو أنا وياك نفهمو العمق ديال هادشي. ملي كتسمع لشي حد، كتحاول تفهم وتربط، هنا فاش الدماغ كيبدا يوسّع ويطوّر. ومع الوقت أكيد كتخدم فدماغك واحد البطونة سميتها "لوجيك". صافي، كتولي كلشي كتحلّلو بالمنطق.</p>`,
+a:`<p>في السنوات الأخيرة، أصبحت المثلية الجنسية موضوعاً حاضراً بقوة في النقاش العالمي، وبات يُطرح حتى في المجتمعات العربية والإسلامية. ورغم أن القانون في دول كالمغرب لا يزال يعاقب على العلاقات المثلية، إلا أن وجودها في المجتمع واقع لا يمكن إنكاره.</p>
+<p>في هذا الكتاب سنحاول أنا وأنت أن نفهم العمق الحقيقي لهذا الأمر. حين تستمع لشخص ما، تحاول أن تفهم وتربط، وهنا يبدأ العقل في التوسع والتطور.</p>`,
+f:`<p>Dans ce livre, nous allons essayer ensemble de comprendre la profondeur réelle de cette question. Ces dernières années, l'homosexualité est devenue un sujet très présent dans le débat mondial.</p>`,
+e:`<p>In this book, we'll try together to understand the real depth of this matter. In recent years, homosexuality has become a powerfully present topic in global discourse.</p>`
+}},
+
+// MQ3 - PAYWALL
+{type:'inner',ch:'mq',n:3,c:{
+d:`<p>مثلاً، كيفاش كتستنتج إلى لاحظتي نتا كتحس بميول جنسي ولكن فنفس الوقت كتبقى تقول: "مافهمتش أنا مالي؟ واش أنا بوحدي اللي هاكا؟" إذن أنا هو هاداك الشخص اللي كيعيطو عليه بذاك المصطلح، راك عارف، بلا ما نگولو حشمنا منك هههه.</p>
+<p>وداك المصطلح مطروح على الواقع كاين، إذن كتستنتج: أنا حيت كاين وشائع وعندو اهتمام كبير، أنك راه ماشي بوحدك. وأن هادشي يقدر يكون عندو علاقة بالجينات مثلاً، أو بالمجتمع اللي عايش فيه، أو هرمونات.</p>
+<p>دابا أنا وياك شنو غانديرو؟ غانحاولو نعطيو فرصة لجانب خور، وحتى نتا عطيني فرصة نقوليك اشنو استنتجت. نتا ما خاسر والو، ما خاسر والو أعشيري! يالاه نبداو نطرحو أسئلة ونكشيو مع بعضياتنا.</p>`,
+a:`<p>كيف تستنتج إذا لاحظت أنك تشعر بميل جنسي لكنك تتساءل: "ما بي؟ هل أنا وحدي هكذا؟" إذن أنت ذلك الشخص الذي يُسمى بذلك المصطلح، تعرف، دون أن نذكره ههه.</p>
+<p>وذلك المصطلح موجود على أرض الواقع، إذن تستنتج: أنت لست وحدك. وأن هذا قد يكون له علاقة بالجينات أو المجتمع أو الهرمونات.</p>`,
+f:`<p>Comment déduire si tu remarques que tu ressens une attirance mais tu te demandes : "Qu'est-ce que j'ai ? Suis-je le seul comme ça ?" Alors tu es cette personne qu'on appelle avec ce terme, tu sais, sans le nommer hhhh.</p>`,
+e:`<p>How do you deduce if you notice you feel an attraction but keep asking yourself: "What's wrong with me? Am I the only one like this?" Then you are that person called by that term, you know, without naming it hahaha.</p>`
+}},
+
+// PAYWALL
+{type:'paywall'},
+
+// C1-1
+{type:'inner',ch:'c1',n:4,c:{
+d:`<div class="ch-title">الفصل الأول: من الأصل تال البروستات</div>
+<p>نرجعو شوية للّور، نبداو من الأصل. كُلنا كنعرفو أن حنا جينا على تطوُّر. هنا غاتفكر شوية وتطرح سؤال: واش حتى الأعضاء والأماكن ديالها عقلو على هاد الأماكن دابا ورجعولها؟</p>
+<p>واش تقدر المثلية تكون عندها علاقة بهادشي؟ أنا غانجي وندير فيها فيلسوف ونقولك: آه كاين، ممكن. حنا نحطو الأدلة ديالي وانت شوف.</p>
+<p>عمرك تساءلتي وگلتي: <strong>علاش البروستات جاية جهة الدبر؟</strong> بلُغتنا حنا "الخرزة". على حساب النظرية ديالي، غاتقولي: كون كانت صحيحة، البروستات ما محتاجاش تكون مشاركة، راه عندها واحد الدور آخر. أنا بالنسبة ليا، النقطة الأقرب بيناتهم هي هاديك.</p>
+<p>البروستات هي واحد الغدة صغيرة، الحجم ديالها بحال شي كركاعة ولا مشماشة (فيها تقريباً بين 11 حتى 20 غرام عند الراجل البالغ)، وكاينة غير عند الرجال. البلاصة ديالها: كاينة نيشان تحت المثانة، وقدام المستقيم.</p>`,
+a:`<div class="ch-title">الفصل الأول: من الأصل إلى البروستات</div>
+<p>لنعود قليلاً إلى الوراء. كلنا نعرف أننا جئنا عبر التطور. هل تساءلت يوماً: <strong>لماذا تقع البروستات في اتجاه الشرج؟</strong></p>
+<p>البروستات هي غدة صغيرة بحجم حبة الكستناء (من 11 إلى 20 غراماً عند الرجل البالغ)، موجودة فقط عند الذكور. موقعها: أسفل المثانة مباشرة، وأمام المستقيم.</p>`,
+f:`<div class="ch-title">Chapitre 1 : De l'origine à la prostate</div>
+<p>Remontons un peu en arrière. T'es-tu jamais demandé : <strong>pourquoi la prostate se trouve-t-elle du côté de l'anus ?</strong></p>
+<p>La prostate est une petite glande de la taille d'une châtaigne (environ 11 à 20 grammes chez l'homme adulte), présente uniquement chez les hommes.</p>`,
+e:`<div class="ch-title">Chapter 1: From Origins to the Prostate</div>
+<p>Let's go back a little. Have you ever asked yourself: <strong>why is the prostate located near the anus?</strong></p>
+<p>The prostate is a small gland about the size of a walnut (approximately 11 to 20 grams in an adult male), found only in men.</p>`
+}},
+
+// C1-2
+{type:'inner',ch:'c1',n:5,c:{
+d:`<p>هنا بانت ليا ثغرة: يقدر تكون هاديك هي أقرب position ديالها، ويكون عندها دور ثانوي. مايكونش الذكر عبر التطور كان كيمارس المثلية من الخلف، وهي اللي خلات البروستات يجي قريب من القضيب؟</p>
+<div class="hl">وبشكل أعمق، تقدر تكون حتى المسافة عندها علاقة برياضيات الجنس:
+<ul class="bl" style="margin-top:6px">
+<li>المسافة بين البروستات (مسؤولة على النشوة) والقضيب: من 5 تال 7 سم</li>
+<li>المسافة بينها وبين فتحة الدبر: 2 سم فقط</li>
+</ul></div>
+<p>هنا عاوتاني كاتقول: واش كيمارس من اللور كتر من القضيب؟ حنا كندويو عبر تاريخ المخلوقات.</p>
+<p>ممكن يكون مع الوقت ما بقاتش غير دور التكاثر، بداو يتأكتيفاو المشاعر والأحاسيس، ولات المتعة بحد ذاتها عايشة فالجسد. مع الوقت، ممكن الرجل بدا يحس بالانجذاب جيهة الرجل لأسباب نفسية مثلاً، كايبغي يحس معاه براجل فحياتو.</p>
+<p>حنا كنستنتجو أنا وياك، ماكنقولش هادي هي الحقيقة المطلقة، مجرد استنتاجات.</p>`,
+a:`<p>هنا وجدت ثغرة: ربما يكون ذلك الموقع هو الأقرب لها، ولها دور ثانوي. ماذا لو كان الذكر عبر التطور يمارس المثلية من الخلف، وهذا ما جعل البروستات تقترب من القضيب؟</p>
+<div class="hl">المسافة بين البروستات والقضيب: 5 إلى 7 سم<br>المسافة بينها وبين فتحة الشرج: 2 سم فقط</div>
+<p>هل هذه الخريطة التشريحية مجرد مصادفة؟</p>`,
+f:`<p>C'est là que j'ai remarqué une faille : la distance entre la prostate et le pénis est d'environ 5 à 7 cm, mais la distance entre elle et l'anus est de seulement 2 cm.</p>
+<div class="hl">Cette carte anatomique est-elle vraiment une coïncidence ?</div>`,
+e:`<p>This is where I noticed a gap: the distance between the prostate and penis is approximately 5 to 7 cm, but the distance between it and the anus is only 2 cm.</p>
+<div class="hl">Is this anatomical map really just a coincidence?</div>`
+}},
+
+// C2-1
+{type:'inner',ch:'c2',n:6,c:{
+d:`<div class="ch-title">الفصل الثاني: الجانب النفسي وتاريخ الأحكام</div>
+<p>غانديرو الاستنتاج النهائي ديال داكشي اللي گلنا: استنتجنا أنه بما أن حنا عبارة على جينات وحنا غير واحد مجموعة ديال سلوكيات إنسانية وجسدية ديال الإنسان اللي فاتنا، فراه البروستات ما كانت مكانها تمة غير هكاك إلى عندها علاقة مباشرة.</p>
+<p>حنا حالياً راه اللي مخليينا على قيد الحياة وجيناتنا قوية باش تشبت بالبقاء، هي الأحاسيس والمشاعر: <strong>متعة، حزن، خوف، أمان…</strong> الحزن؟ راه حتى هو ضروري. كون ماكانش الحزن، كون الوجود ما عندو معنى.</p>
+<p>دابا حنا كنستنتجو أن حتى هاد الأحاسيس عندها علاقة مباشرة بالإنسان عبر التاريخ. والدوبامين هو اللي كيتفرز فاش كتكون فعلاقة جنسية. دماغك هنا كيدير:</p>
+<div class="hl">"اللي كيجيب ليا هاد الشعور = حاجة زوينة = نعاودها"</div>`,
+a:`<div class="ch-title">الفصل الثاني: الجانب النفسي وتاريخ الأحكام</div>
+<p>بما أننا عبارة عن جينات، ومجموعة من السلوكيات الإنسانية الموروثة، فالبروستات لم تأت في ذلك الموضع عبثاً.</p>
+<p>الدوبامين هو ما يُفرز حين تعيش متعة. دماغك يصنع رابطاً:</p>
+<div class="hl">"ما يمنحني هذا الشعور = شيء جيد = أريد تكراره"</div>`,
+f:`<div class="ch-title">Chapitre 2 : L'aspect psychologique</div>
+<p>Puisque nous sommes des gènes et un ensemble de comportements humains hérités, la prostate n'est pas arrivée à cet endroit par hasard.</p>
+<div class="hl">"Ce qui me donne cette sensation = quelque chose de bien = je veux le répéter"</div>`,
+e:`<div class="ch-title">Chapter 2: The Psychological Aspect</div>
+<p>Since we are genes and a collection of inherited human behaviors, the prostate didn't end up in that location by accident.</p>
+<div class="hl">"What gives me this feeling = something good = I want to repeat it"</div>`
+}},
+
+// C2-2
+{type:'inner',ch:'c2',n:7,c:{
+d:`<p>أجي نخربقو شوية فالآلاف العوام الماضية. حنا كلنا عارفين بأن المثلية عندها تاريخ موثق ومقبولة اجتماعياً.</p>
+<p>شنو دارو؟ ولات المثلية ممنوعة اجتماعياً. وكاين تفسيرين: اللي مؤمن بخالق إبراهيمي سيقول "حرام". واللي مقطع الوراق سيقول: ربما ناس كانت تريد التكاثر السريع وقررت تحريمها اجتماعياً ودينياً؟</p>
+<p>إذن كاين اختلاف بين الجينات والأحكام الاجتماعية. واللي بغينا نوصلو ليه: هاد الاختلاف هو اللي مخليك ما تتصالحش مع راسك.</p>
+<p>فاش كتشوف المجتمع والدين يرفض داكشي نهائياً، دماغك كيقول: "أنا ما كنبغيش الدراري." وهنا كيولد الكبت والمعاناة الداخلية.</p>`,
+a:`<p>الجميع يعلم أن المثلية لها تاريخ موثق وكانت مقبولة اجتماعياً. ثم أصبحت محظورة اجتماعياً، وهناك تفسيران لذلك.</p>
+<p>ما نريد الوصول إليه: هذا الاختلاف بين الجينات والأحكام الاجتماعية هو ما يجعلك لا تتصالح مع نفسك.</p>`,
+f:`<p>Tout le monde sait que l'homosexualité a une histoire documentée et était socialement acceptée. Ce que nous voulons atteindre : cette différence entre les gènes et les jugements sociaux est ce qui t'empêche de te réconcilier avec toi-même.</p>`,
+e:`<p>Everyone knows homosexuality has a documented history and was once socially accepted. What we want to reach: this difference between genes and social judgments is what prevents you from reconciling with yourself.</p>`
+}},
+
+// C3-1
+{type:'inner',ch:'c3',n:8,c:{
+d:`<div class="ch-title">الفصل الثالث: أنواع المثلية والشخصية</div>
+<p>دابا حالياً، عندنا أنواع ديال المثليين:</p>
+<ul class="bl">
+<li><strong>سالب 💯:</strong> كايحس براسو مرا – كاين اللي غير بينو وبين راسو، وكاين اللي خارج ليها كود (Direct)</li>
+<li><strong>Les deux:</strong> كيبغي موجب وسالب، هاد النوع غالباً كيكون مرجّل</li>
+<li><strong>موجب 💯</strong></li>
+<li><strong>Bi (مزدوج الميول):</strong> كاين Bi Actif، Bi Passif، Bi Les deux</li>
+<li><strong>مكبوت:</strong> ظروفو الاجتماعية والمادية خلاتو يكون Actif فدماغو بس</li>
+</ul>
+<p>حنا شنو غانديرو؟ غانحاولو نفهمو كل واحد علاش هو فديك الحالة المعينة. باش يكون صحيح (بما أن حنا غير جينات)، ما خاصش يكونو هاد الأنواع، خاص نكونو متقاربين على الأقل.</p>`,
+a:`<div class="ch-title">الفصل الثالث: أنواع المثلية والشخصية</div>
+<ul class="bl">
+<li><strong>السالب:</strong> يشعر أنه أنثى</li>
+<li><strong>الاثنان:</strong> يحب الدورين</li>
+<li><strong>الموجب</strong></li>
+<li><strong>ثنائي الميول (Bi):</strong> بأشكاله المختلفة</li>
+<li><strong>المكبوت:</strong> ظروفه تمنعه من التعبير</li>
+</ul>`,
+f:`<div class="ch-title">Chapitre 3 : Les types d'homosexualité</div>
+<ul class="bl">
+<li><strong>Passif :</strong> Se sent féminin</li>
+<li><strong>Les deux (Versatile)</strong></li>
+<li><strong>Actif</strong></li>
+<li><strong>Bisexuel (Bi) :</strong> sous différentes formes</li>
+<li><strong>Refoulé :</strong> ses circonstances l'empêchent de s'exprimer</li>
+</ul>`,
+e:`<div class="ch-title">Chapter 3: Types of Homosexuality</div>
+<ul class="bl">
+<li><strong>Passive:</strong> Feels feminine</li>
+<li><strong>Both (Versatile)</strong></li>
+<li><strong>Active</strong></li>
+<li><strong>Bisexual (Bi):</strong> in various forms</li>
+<li><strong>Suppressed:</strong> circumstances prevent expression</li>
+</ul>`
+}},
+
+// C3-2
+{type:'inner',ch:'c3',n:9,c:{
+d:`<p><strong>1) المبنّت علناً:</strong> هاد النوع أدّاتو ظروف الحياة للحساسية الزايدة وضعف الشخصية. تخيل بنادم يعيش فمجتمع كيقول: "المثلي = ناقص رجولة، حرام، شذوذ…" وهو فداخلو كيعرف أنه كيميل لهاد النوع ديال العلاقة.</p>
+<p>شنو كيوقع؟ كبت داخلي، تساؤلات طويلة: "علاش أنا هكا؟ علاش ماشي بحال صحابي؟" مع الوقت، كيلقى راحو فدور "المرة"، كيقلد صورة الأنثى، كيعطي الجرأة للذات اللي كانت مخبيا.</p>
+<p><strong>2) سالب ولكن مرجّل:</strong> كاين جوج احتمالات؛ إما راه ما عندوش الجرأة، أو المكانة الاجتماعية والعائلية ما كتسمحلوش. فالأخير كيولي مرا مع راسو وراجل فالمجتمع، عايش جوج شخصيات.</p>
+<p><strong>3) Les deux (Versatile):</strong> الظروف ديالو خلاتو يستنتج أنه يقدر يجمع الاتجاهين. الدور اللي كيلعبو فالعلاقة كيولي مسألة ديال الشعور فداك اللحظة، ماشي هوية ثابتة.</p>`,
+a:`<p><strong>1) المخنّث علناً:</strong> ظروف الحياة جرّته للحساسية الزائدة. مع الوقت يجد نفسه في دور "المرأة".</p>
+<p><strong>2) سالب لكن رجولي:</strong> إما لأن الجرأة لم تصله، أو لأن مكانته الاجتماعية لا تسمح له. يعيش شخصيتين.</p>
+<p><strong>3) الاثنان (Versatile):</strong> الدور الذي يلعبه يصبح مسألة شعور لحظي، ليس هوية ثابتة.</p>`,
+f:`<p><strong>1) Efféminé au grand jour :</strong> Les circonstances l'ont mené à l'hypersensibilité. Avec le temps, il se retrouve dans le rôle de "la femme".</p>
+<p><strong>2) Passif mais viril :</strong> Soit manque de courage, soit statut social. Vit deux personnalités.</p>
+<p><strong>3) Les deux (Versatile) :</strong> Le rôle devient une question de ressenti du moment, pas une identité fixe.</p>`,
+e:`<p><strong>1) Openly Effeminate:</strong> Life circumstances led to hypersensitivity. Over time, they find themselves in the "woman's" role.</p>
+<p><strong>2) Passive but Masculine:</strong> Either lacks courage or social status prevents it. Lives two personalities.</p>
+<p><strong>3) Both (Versatile):</strong> The role becomes a matter of feeling in the moment, not a fixed identity.</p>`
+}},
+
+// C3-3
+{type:'inner',ch:'c3',n:10,c:{
+d:`<p><strong>4) الموجب (Actif):</strong> هاد خونا غالباً كيكون عندو واحد التوازن بين شخصيتو وجيناتو. من شخصيتو كيبغي يكون هو الموجب وهو المسيطر فالعلاقة، والعامل النفسي مسيطر على الجينات على حساب المعايير ديال المجتمع.</p>
+<p><strong>5) Bi (مزدوج الميول):</strong> غالباً هاد السيد من صغرو عاش مع البنات، وغالباً ما كتكون تجربتو الأولى مع بنت، ومن بعد عاد كيبقى غادي فرحلة اكتشاف الذات. وبالنسبة للأدوار، كاين Bi Actif وكاين Bi Les deux وكاين Bi Passif.</p>
+<p><strong>6) المكبوت:</strong> راه حتى هو كيمارس الجينات ديالو، غير ظروفو الاجتماعية والمادية خلاتو يكون Actif فدماغو بأصح التعبير، ولكن الإمكانيات المادية ما كتعاونش. احتمال كبير كون كان عندو فلوس يقدر يوصل يكون Bi.</p>
+<p>وكاين حتى النوع اللي كيسمى Hétéro: ظروف الحياة والمراحل لاعبين بشكل كبير فيه. كتلقى هاد النوع ظروفو المادية معاوناه، وكايكون فمرحلة مكتفي بالبنت، عمرو ذاق ديك التجربة الأخرى.</p>`,
+a:`<p><strong>4) الموجب (Actif):</strong> لديه توازن بين شخصيته وجيناته. يحب أن يكون هو المسيطر في العلاقة.</p>
+<p><strong>5) ثنائي الميول (Bi):</strong> نشأ غالباً وسط الإناث، أول تجربة مع امرأة ثم اكتشف الاتجاه الآخر. أشكاله: Bi Actif, Bi Passif, Bi Les deux.</p>
+<p><strong>6) المكبوت:</strong> لديه الجينات لكن ظروفه المادية والاجتماعية لا تسمح له. لو كان لديه إمكانيات لكان Bi.</p>`,
+f:`<p><strong>4) Actif :</strong> A un équilibre entre sa personnalité et ses gènes. Aime être dominant dans la relation.</p>
+<p><strong>5) Bisexuel :</strong> A souvent grandi entouré de femmes, première expérience avec une femme puis découverte de l'autre direction.</p>
+<p><strong>6) Refoulé :</strong> A les gènes mais ses circonstances ne lui permettent pas de les exprimer.</p>`,
+e:`<p><strong>4) Active:</strong> Has balance between personality and genes. Likes to be dominant in the relationship.</p>
+<p><strong>5) Bisexual:</strong> Often grew up surrounded by women, first experience with a woman then discovered the other direction.</p>
+<p><strong>6) Suppressed:</strong> Has the genes but circumstances don't allow expression.</p>`
+}},
+
+// C4-1
+{type:'inner',ch:'c4',n:11,c:{
+d:`<div class="ch-title">الفصل الرابع: نربطو النقط ونعريو الحقيقة</div>
+<p>دابا حنا غانحاولو نفهمو من الفوق. تخيل راسك الفوق، والأنواع كتشوف فيهم بذاك الوصف. كتلقى أن داك الـ Passif المشوه، إلى بدلنا ليه مشوار الحياة وحطيناه فمشوار ديال Actif أو Hétéro مثلاً، غادي تبدّل ليهم حتى الميولات الجنسية.</p>
+<p>دونك هنا كايبان لينا أنه عندنا الحق نتحكمو فيهم. ونلاقيو نقطة وحدة إلى بغينا نوحدوهم.</p>
+<p>عندنا عرفنا أن هادشي اللي فيك راه جينات. وعرفنا منين جاو الأحكام الاجتماعية والدينية. إلى ربطنا هاد الجوج غانلقاو: كون ما كانش هادشي اللي دارو المجتمع والأديان، كون عايشين الطبيعة ديالنا، مرتاحين وعايشين الحياة En rose!</p>
+<div class="hl">الدور ديالنا الآن: نرجعو الورد لبلاصتو، ونعيشوه كاملين.</div>`,
+a:`<div class="ch-title">الفصل الرابع: ربط النقاط وكشف الحقيقة</div>
+<p>الآن نحاول أن نرى من الأعلى. إذا غيّرنا مسار حياة الـ Passif وضعناه في مسار Actif، ستتغير حتى ميوله الجنسية.</p>
+<p>هذا يعني أن بإمكاننا التحكم فيها. ولو لم تكن الأحكام الاجتماعية والدينية، لكنا نعيش طبيعتنا بشكل مريح.</p>
+<div class="hl">دورنا الآن: إعادة الوردة إلى مكانها، وعيشها كاملين.</div>`,
+f:`<div class="ch-title">Chapitre 4 : Relier les points et révéler la vérité</div>
+<p>Si on changeait le parcours de vie d'un Passif et le mettait dans le parcours d'un Actif, ses attirances sexuelles changeraient aussi.</p>
+<div class="hl">Notre rôle maintenant : remettre la rose à sa place et la vivre pleinement.</div>`,
+e:`<div class="ch-title">Chapter 4: Connecting the Dots and Revealing the Truth</div>
+<p>If we changed the life path of a Passive person and put them in an Active person's path, even their sexual attractions would change.</p>
+<div class="hl">Our role now: return the rose to its place, and live it fully.</div>`
+}},
+
+// C4-2
+{type:'inner',ch:'c4',n:12,c:{
+d:`<p>كيف گلنا، كاتكبر بأفكار من الصغر: "لا لا لا، المثلية خط أحمر فالمجتمع"، وانت كتحس بطبيعتك. فاش كتشوف المجتمع والدين يرفض داكشي نهائياً، دماغك كيقول: "أنا ماشي ديال الدراري."</p>
+<p>فاش كاتنعس مع البنت فالفراش، كاينوض داك الضغط ديال المجتمع والدين رافض داكشي وأنا كنرتاح فيه. الدماغ كايرسل إشارات ديال القضيب والدوبامين اللي خاص يكونو حاضرين فعلاقة جنسية، لا كايوظفهومش. وهنا كاتلقى مالقيتيش لا متعة، ولا قضيب ديالك بغى يبقى منتصب.</p>
+<p>إلى انت فهمتي هادشي كامل، إلى فهمتي أنك راه طبيعي تمارس مع دري وبنت، غادي تكون à l'aise، والدوبامين خدامين مزيان. هكا غاتصالح مع راسك.</p>
+<div class="hl">وملي حلّينا هاد القوس: هاد الرسالة ليك أختي: إلى كان راجلك كيبغي يمارس مع دري، خاصك تكوني كتحترمي الطبيعة ديالو.</div>`,
+a:`<p>حين تنام مع امرأة في الفراش، يبدأ ضغط المجتمع والدين الرافض لما ترتاح إليه. ولهذا قد لا تجد متعة ولا انتصاباً.</p>
+<p>إذا فهمت أنه من الطبيعي أن تمارس مع رجل وامرأة، ستكون مرتاحاً، والدوبامين سيعمل بشكل جيد. هكذا ستتصالح مع نفسك.</p>`,
+f:`<p>Quand tu dors avec une femme dans le lit, la pression de la société qui rejette ce en quoi tu te sens à l'aise commence. C'est pourquoi tu ne trouves pas de plaisir.</p>
+<p>Si tu comprends qu'il est naturel de pratiquer avec un homme et une femme, tu seras à l'aise et la dopamine fonctionnera bien.</p>`,
+e:`<p>When you sleep with a woman in bed, society's pressure against what you feel comfortable with begins. This is why you may find no pleasure.</p>
+<p>If you understand that it's natural to be with both a man and woman, you'll be comfortable and dopamine will work well.</p>`
+}},
+
+// KH - خاتمة
+{type:'inner',ch:'kh',n:13,c:{
+d:`<div class="ch-title">الخاتمة: حقيقة الشذوذ والتصالح مع الذات</div>
+<p>فاش كتشوف هادشي كامل بنظرة وحدة وفكرة وحدة، كتولي تستنتج أن "الشذوذ الجنسي" اللي دوينا عليه هادشي كامل، أصلاً ماشي هو الشذوذ الجنسي!</p>
+<p>غاتقولي: "هو دري مع دري." وغانقوليك: علاش قلتي هاد الجواب وانت ما فاهم والو ومازال ما قريتي الكتاب كاع؟ جيناتك غاتقوليك: "راه حرام، راه ممنوع اجتماعياً."</p>
+<div class="hl">الشذوذ الجنسي الحقيقي: هو أنك ما ديرش ديك الحاجة اللي كتحسها من الداخل، أو تبدا تقول حتى انت راه داكشي شذوذ. هاد الفكرة بحد ذاتها: شذوذ فكري.</div>
+<p>فالنصيحة ديالي الأولى: عنقو بعضياتكم. وإلى كنتي أختي وراجلك كيبغي يمارس مع دري، خاصك تحترمي الطبيعة ديالو. وإلى قريتي الكتاب كامل، غاتكوني مقتنعة وغاتجيك عادية.</p>`,
+a:`<div class="ch-title">الخاتمة: حقيقة الشذوذ والمصالحة مع الذات</div>
+<p>حين ترى كل هذا بنظرة واحدة، تستنتج أن "الشذوذ الجنسي" ليس ما تظن.</p>
+<div class="hl">الشذوذ الجنسي الحقيقي: هو أن لا تفعل ما تشعر به من الداخل، أو أن تقول بنفسك إن ذلك شذوذ. هذه الفكرة بحد ذاتها: شذوذ فكري.</div>`,
+f:`<div class="ch-title">Conclusion : La vraie déviance et la réconciliation</div>
+<div class="hl">La vraie déviance sexuelle : c'est de ne pas faire ce que tu ressens de l'intérieur, ou de dire toi-même que c'est une déviance. Cette idée en elle-même : c'est une déviance intellectuelle.</div>`,
+e:`<div class="ch-title">Conclusion: The Real Deviance and Reconciliation</div>
+<div class="hl">The real sexual deviance: is not doing what you feel inside, or saying yourself that it's deviance. This idea itself: is intellectual deviance.</div>`
+}},
+
+// KH2
+{type:'inner',ch:'kh',n:14,c:{
+d:`<p>إيوا أسيادنا، شافكم الأسد! كان معاكم واحد الدماغ لابس كركاس، سميتو RVR.</p>
+<p>أنا غير دماغ كينقل الأفكار عن طريق هاد الوجه اللي كايكتب ليكم. أنا و Abdo Moka ولّينا عشران تال الموووت.</p>
+<p>إلى ساليتي هاد الكتاب، كاين كتاب قبلو اللي ذكرناه، ابحثو عليه فالأنترنت غاتلقاوه إن شاء الله.</p>
+<div class="hl">يالاه أخوتي تصبحو على خير. عنقو بعضياتكم بلا ذنب، وبلا ما تكونو عبيد للأحكام اللي تقالت قبل ما تولدو. تهلاو فراسكم والورد يرجع لبلاصتو! 💋</div>
+<p style="text-align:center;margin-top:16px;color:var(--text2);font-size:0.85rem;">RVR & Abdo Moka – 2025</p>`,
+a:`<p>وداعاً أصدقاءنا! معكم دماغ يحمل أفكاراً، اسمه RVR، وأنا وAbdo Moka أصبحنا عشرين معاً.</p>
+<div class="hl">تصبحون على خير. تعانقوا بلا ذنب، ولا تكونوا عبيداً للأحكام التي قيلت قبل أن تولدوا. 💋</div>`,
+f:`<p>Au revoir mes amis ! Un cerveau nommé RVR était avec vous, moi et Abdo Moka sommes devenus des intimes.</p>
+<div class="hl">Bonne nuit. Serrez-vous dans les bras sans culpabilité, et ne soyez pas esclaves des jugements prononcés avant votre naissance. 💋</div>`,
+e:`<p>Farewell friends! A mind named RVR was with you, Abdo Moka and I have become close friends.</p>
+<div class="hl">Good night. Hug each other without guilt, and don't be slaves to judgments made before you were born. 💋</div>`
+}},
+
+{type:'back-cover'}
+];
+
+function isRTL(){return lang==='d'||lang==='a';}
+
+function renderPage(idx){
+  const p=pages[idx];
+  const area=document.getElementById('pagesArea');
+  area.querySelectorAll('.page,.paywall-page').forEach(el=>el.classList.remove('active'));
+  let el=area.querySelector(`[data-page="${idx}"]`);
+  if(!el){el=document.createElement('div');el.dataset.page=idx;area.appendChild(el);}
+
+  if(p.type==='cover'){
+    el.className='page cover active';
+    const tv=T.cover[lang];
+    el.innerHTML=`
+      <div class="cover-corner tl"></div><div class="cover-corner tr"></div>
+      <div class="cover-corner bl"></div><div class="cover-corner br"></div>
+      <div class="cover-bg">طبيعة</div>
+      <div class="cover-wrap">
+        <div class="cover-tag">${tv[3]}</div>
+        <div class="cover-title">${tv[0]} <span>${tv[1]}</span></div>
+        <div class="cover-sub">${tv[2]}</div>
+        <div class="cover-line"></div>
+        <div class="cover-author">بقلم <span>RVR & Abdo Moka</span></div>
+        <div class="cover-edition">النسخة الكاملة • 2025</div>
+      </div>`;
+  } else if(p.type==='back-cover'){
+    el.className='page back-cover active';
+    const q={d:'الطبيعة… أ ربيعة،\nماشي دايماً كما كيصوروها ليك،\nولكن دائماً فيها منطق،\nإلا عطيت لدماغك الفرصة يفهمو.',
+      a:'الطبيعة… يا ربيعة،\nليست دائماً كما يصوّرونها لك،\nلكن فيها دائماً منطق.',
+      f:'La nature… ô Rabia,\nn\'est pas toujours comme on te la décrit,\nmais elle a toujours une logique.',
+      e:'Nature… O Rabia,\nnot always as they paint it for you,\nbut always with logic within.'};
+    el.innerHTML=`<div class="back-wrap">
+      <div style="color:rgba(64,145,108,0.25);font-size:2rem;margin-bottom:16px;">❝</div>
+      <div class="back-quote">${q[lang].replace(/\n/g,'<br>')}</div>
+      <div style="color:rgba(245,230,200,0.3);font-size:0.85rem;">RVR & Abdo Moka</div>
+    </div>`;
+  } else if(p.type==='paywall'){
+    el.className='paywall-page active'; showPwModal();
+    const waMsg=encodeURIComponent('مرحبا، بغيت نشري الكتاب الكامل 📚');
+    const msgs={
+      d:{title:'هنا توقفنا… 🔒',sub:'الكتاب الكامل فيه بزاف أكثر:\nالأنواع، الجانب النفسي، الحقيقة الكاملة.',lbl:'خلص عبر RIB ديال Attijariwafa',price:'9$ (تقريباً 90 DH)',note:'خلص وبعث screenshot على WhatsApp، نبعث ليك كود الدخول',wa:'تواصل على WhatsApp'},
+      a:{title:'توقفنا هنا… 🔒',sub:'الكتاب الكامل يحتوي الكثير أكثر.',lbl:'ادفع عبر RIB',price:'9$ (حوالي 90 DH)',note:'ادفع وأرسل لقطة شاشة على WhatsApp، سنرسل لك كود الدخول',wa:'تواصل على WhatsApp'},
+      f:{title:'On s\'arrête ici… 🔒',sub:'Le livre complet contient beaucoup plus.',lbl:'Payer via RIB Attijariwafa',price:'9$ (environ 90 DH)',note:'Payez et envoyez une capture d\'écran sur WhatsApp, nous vous enverrons le code',wa:'Contacter sur WhatsApp'},
+      e:{title:'We stop here… 🔒',sub:'The full book contains much more.',lbl:'Pay via RIB Attijariwafa',price:'9$ (approx 90 DH)',note:'Pay and send a screenshot on WhatsApp, we\'ll send you the access code',wa:'Contact on WhatsApp'}
+    };
+    const m=msgs[lang];
+    el.innerHTML=`
+      <div class="pw-icon">📚</div>
+      <div class="pw-title">${m.title}</div>
+      <div class="pw-sub">${m.sub.replace(/\n/g,'<br>')}</div>
+      <div class="pay-box">
+        <div class="pay-label">${m.lbl}</div>
+        <div class="rip-num">${RIP}</div>
+        <div class="pay-price">${m.price}</div>
+        <div class="pay-note">${m.note}</div>
+      </div>
+      <div class="divider">— أو —</div>
+      <a href="https://wa.me/${WA}?text=${waMsg}" target="_blank" class="wa-btn">💬 ${m.wa}</a>`;
+  } else {
+    el.className='page active';
+    el.innerHTML=`
+      <div class="page-header">
+        <span class="chapter-label">${T.ch[p.ch][lang]}</span>
+        <span class="page-num">${p.n}</span>
+      </div>
+      <div class="page-body">
+        <div class="page-text">${p.c[lang]}</div>
+      </div>`;
+  }
+  document.getElementById('prevBtn').disabled=idx===0;
+  document.getElementById('nextBtn').disabled=idx===pages.length-1;
+  document.getElementById('pageInd').textContent=`${idx+1} / ${pages.length}`;
+}
+
+function changePage(d){
+  const next=pg+d;
+  if(next<0||next>=pages.length)return;
+  if(!unlocked&&next>=FREE+1&&pages[next].type!=='paywall'){
+    pg=FREE+1;renderPage(pg);return;
+  }
+  pg=next;renderPage(pg);
+}
+
+function nav(dir){
+  changePage(dir==='next'?1:-1);
+}
+
+function setLang(l,btn){
+  lang=l;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.documentElement.dir=isRTL()?'rtl':'ltr';
+  document.getElementById('prevBtn').innerHTML=isRTL()?'&#8594;':'&#8592;';
+  document.getElementById('nextBtn').innerHTML=isRTL()?'&#8592;':'&#8594;';
+  renderPage(pg);
+}
+
+function checkCode(){
+  const v=document.getElementById('codeInput').value.trim().toUpperCase();
+  if(isValidCode(v)){
+    unlocked=true;
+    localStorage.setItem('rvr_access','1');
+    // Close paywall modal and go to next page
+    document.getElementById('pwModal').style.display='none';
+    pg = FREE+2; // jump past paywall to first paid page
+    renderPage(pg);
+  } else {
+    document.getElementById('codeError').textContent='❌ الكود غلط';
+    document.getElementById('codeInput').style.borderColor='#c0392b';
+  }
+}
+document.getElementById('codeInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter')checkCode();
+  document.getElementById('codeError').textContent='';
+  document.getElementById('codeInput').style.borderColor='';
+});
+
+// Auto-open book directly, no code needed to start
+(function(){
+  document.getElementById('accessModal').style.display='none';
+  document.getElementById('langBar').style.display='flex';
+  document.getElementById('bookWrap').style.display='flex';
+  document.getElementById('controls').style.display='flex';
+  if(localStorage.getItem('rvr_access')==='1'){unlocked=true;}
+  renderPage(0);
+})();
+
+let startX=0;
+document.getElementById('bookStage').addEventListener('touchstart',e=>{startX=e.touches[0].clientX;});
+document.getElementById('bookStage').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-startX;
+  if(Math.abs(dx)>40){
+    if(isRTL())changePage(dx<0?1:-1);
+    else changePage(dx>0?-1:1);
+  }
+});
+</script>
+
+<!-- PAYWALL MODAL -->
+<div id="pwModal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(8,28,21,0.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;">
+  <div style="background:#f6faf7;border:1px solid rgba(45,106,79,0.2);border-radius:16px;padding:36px 28px;max-width:380px;width:90%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.2);">
+    <div style="font-size:44px;margin-bottom:12px">📚</div>
+    <div style="font-family:'Amiri',serif;color:#1a1008;font-size:1.3rem;margin-bottom:8px" id="pwTitle">هنا توقفنا… 🔒</div>
+    <div style="color:#2d6a4f;font-size:0.82rem;line-height:1.7;margin-bottom:14px" id="pwSub">الكتاب الكامل فيه بزاف أكثر.<br>خلص عبر RIB وبعث screenshot على WhatsApp.</div>
+    <div style="background:#e8f4ec;border:1px solid rgba(45,106,79,0.2);border-radius:10px;padding:14px;margin-bottom:12px">
+      <div style="font-size:0.7rem;color:#2d6a4f;font-weight:700;letter-spacing:1px;margin-bottom:6px">RIB – Attijariwafa Bank</div>
+      <div style="background:#fff;border:1px solid rgba(45,106,79,0.15);border-radius:6px;padding:8px 12px;font-family:monospace;font-size:0.82rem;color:#1a1008;direction:ltr;word-break:break-all;margin-bottom:6px">00748000063953004005781</div>
+      <div style="font-size:1.05rem;font-weight:700;color:#2d6a4f">9$ ≈ 90 DH</div>
+    </div>
+    <a href="https://wa.me/212635924374?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D8%8C%20%D8%A8%D8%BA%D9%8A%D8%AA%20%D9%86%D8%B4%D8%B1%D9%8A%20%D8%A7%D9%84%D9%83%D8%AA%D8%A7%D8%A8%20%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:11px 22px;background:#25D366;color:#fff;border-radius:8px;text-decoration:none;font-family:'Cairo',sans-serif;font-weight:700;font-size:0.88rem;margin-bottom:14px">💬 تواصل على WhatsApp</a>
+    <br>
+    <div style="font-size:0.72rem;color:#aaa;margin-bottom:10px">— أو عندك كود؟ —</div>
+    <input type="text" id="codeInput" placeholder="أدخل كود الدخول" maxlength="12" dir="ltr" style="width:100%;padding:11px;background:#e8f4ec;border:1px solid rgba(45,106,79,0.2);border-radius:8px;color:#1a1008;font-size:1rem;text-align:center;letter-spacing:3px;font-family:'Cairo',sans-serif;outline:none;margin-bottom:8px">
+    <button onclick="checkCode()" style="width:100%;padding:11px;background:linear-gradient(135deg,#1b4332,#40916c);color:#fff;font-weight:700;font-size:0.95rem;border:none;border-radius:8px;cursor:pointer;font-family:'Cairo',sans-serif">دخول بالكود</button>
+    <div class="modal-error" id="codeError"></div>
+  </div>
+</div>
+<script>function showPwModal(){
+  const m=document.getElementById('pwModal');
+  m.style.display='flex';
+  m.style.alignItems='center';
+  m.style.justifyContent='center';
+}</script>
+</body>
+</html>
