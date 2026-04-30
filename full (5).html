@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الطبيعة أ ربيعة</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#d4ede0; --page:#ffffff; --page2:#e0f2e9;
+  --text:#0a1a0f; --text2:#1b4332;
+  --accent:#1b5e3b; --accent2:#2d8653;
+  --gold:#1b5e3b; --border:rgba(27,94,59,0.3);
+  --spine:#0d2b1a;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);min-height:100vh;font-family:'Cairo',sans-serif;
+  background-image:radial-gradient(ellipse at 15% 25%,rgba(124,74,30,0.06) 0%,transparent 50%),
+  radial-gradient(ellipse at 85% 75%,rgba(58,107,74,0.04) 0%,transparent 50%);}
+
+#accessModal{position:fixed;inset:0;z-index:1000;background:rgba(237,232,220,0.96);
+  display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
+.modal-box{background:var(--page);border:1px solid var(--border);border-radius:16px;
+  padding:40px 32px;max-width:400px;width:90%;text-align:center;
+  box-shadow:0 8px 40px rgba(124,74,30,0.1);}
+.modal-icon{font-size:52px;margin-bottom:14px;}
+.modal-box h2{font-family:'Amiri',serif;color:var(--text);font-size:1.7rem;margin-bottom:6px;}
+.modal-sub{color:var(--text2);font-size:0.85rem;margin-bottom:20px;line-height:1.6;}
+.modal-box input{width:100%;padding:13px 18px;background:var(--page2);
+  border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:1.1rem;
+  text-align:center;letter-spacing:4px;font-family:'Cairo',sans-serif;outline:none;
+  margin-bottom:12px;transition:border-color 0.3s;direction:ltr;}
+.modal-box input:focus{border-color:var(--accent);}
+.modal-box button{width:100%;padding:13px;
+  background:linear-gradient(135deg,#1b4332,#40916c);
+  color:#fff;font-weight:700;font-size:1rem;border:none;border-radius:8px;cursor:pointer;
+  font-family:'Cairo',sans-serif;transition:opacity 0.2s;}
+.modal-box button:hover{opacity:0.85;}
+.modal-error{color:#c0392b;font-size:0.85rem;margin-top:8px;min-height:20px;}
+
+#langBar{position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:center;gap:8px;padding:10px 20px;
+  background:linear-gradient(to bottom,rgba(237,232,220,0.98),transparent);}
+.lang-btn{padding:5px 14px;border-radius:20px;border:1px solid var(--border);
+  background:rgba(250,247,241,0.9);color:var(--text2);font-size:0.78rem;cursor:pointer;
+  font-family:'Cairo',sans-serif;transition:all 0.25s;}
+.lang-btn.active,.lang-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:700;}
+
+#bookWrap{display:flex;flex-direction:column;align-items:center;
+  justify-content:center;min-height:100vh;padding:70px 16px 80px;}
+.book-stage{perspective:2000px;width:min(700px,95vw);}
+.book{width:100%;display:flex;}
+.spine{width:26px;min-height:540px;
+  background:linear-gradient(to right,#040d08,#1b4332,#2d6a4f);
+  border-radius:3px 0 0 3px;display:flex;align-items:center;justify-content:center;
+  box-shadow:-3px 0 10px rgba(0,0,0,0.15);flex-shrink:0;}
+.spine-text{writing-mode:vertical-rl;color:rgba(100,220,150,0.5);
+  font-family:'Cairo',sans-serif;font-size:0.62rem;letter-spacing:2px;transform:rotate(180deg);}
+.pages-area{flex:1;position:relative;min-height:540px;}
+
+.page{position:absolute;inset:0;background:var(--page);
+  border-radius:0 8px 8px 0;padding:34px 30px 26px;overflow:hidden;
+  box-shadow:4px 4px 20px rgba(124,74,30,0.12),inset -1px 0 4px rgba(124,74,30,0.05);
+  display:none;flex-direction:column;animation:pageIn 0.3s ease forwards;}
+.page.active{display:flex;}
+.page.cover{background:linear-gradient(145deg,#081c15 0%,#1b4332 55%,#0d2818 100%);}
+.page.back-cover{background:linear-gradient(145deg,#081c15,#0d2818);}
+@keyframes pageIn{from{opacity:0;transform:translateX(12px);}to{opacity:1;transform:translateX(0);}}
+
+/* COVER */
+.cover-wrap{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:20px;position:relative;}
+.cover-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Amiri',serif;font-size:9rem;color:rgba(255,255,255,0.025);overflow:hidden;}
+.cover-tag{background:var(--accent2);color:#fff;font-size:0.68rem;letter-spacing:2px;
+  padding:4px 14px;border-radius:3px;margin-bottom:18px;font-weight:700;}
+.cover-title{font-family:'Amiri',serif;color:#f5e6c8;
+  font-size:clamp(1.9rem,5.5vw,2.8rem);text-align:center;line-height:1.35;margin-bottom:8px;}
+.cover-title span{color:var(--accent2);}
+.cover-sub{color:rgba(245,230,200,0.4);font-size:0.8rem;text-align:center;
+  letter-spacing:1.5px;margin-bottom:24px;}
+.cover-line{width:48px;height:1px;margin:0 auto 18px;
+  background:linear-gradient(to right,transparent,var(--gold),transparent);}
+.cover-author{color:rgba(245,230,200,0.6);font-size:0.88rem;text-align:center;}
+.cover-author span{color:var(--gold);}
+.cover-edition{margin-top:18px;color:rgba(245,230,200,0.2);font-size:0.68rem;letter-spacing:3px;}
+.cover-corner{position:absolute;width:38px;height:38px;
+  border-color:rgba(64,145,108,0.2);border-style:solid;}
+.cover-corner.tl{top:12px;right:12px;border-width:1px 1px 0 0;}
+.cover-corner.tr{top:12px;left:12px;border-width:1px 0 0 1px;}
+.cover-corner.bl{bottom:12px;right:12px;border-width:0 1px 1px 0;}
+.cover-corner.br{bottom:12px;left:12px;border-width:0 0 1px 1px;}
+
+/* INNER */
+.page-header{display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:14px;padding-bottom:9px;border-bottom:1px solid rgba(124,74,30,0.12);}
+.chapter-label{font-size:0.67rem;color:var(--accent);letter-spacing:1px;font-weight:700;}
+.page-num{font-size:0.68rem;color:#bbb;}
+.page-body{flex:1;overflow:hidden;}
+.ch-title{font-family:'Amiri',serif;color:var(--text);font-size:clamp(0.95rem,2.5vw,1.15rem);
+  margin-bottom:12px;line-height:1.5;padding-bottom:8px;border-bottom:2px solid #40916c;}
+.page-text{font-family:'Amiri',serif;color:var(--text);
+  font-size:clamp(0.88rem,2vw,1rem);line-height:1.95;text-align:justify;}
+html[dir="ltr"] .page-text{font-family:'Cairo',sans-serif;font-size:clamp(0.92rem,2.1vw,1.05rem);line-height:1.85;}
+.page-text p{margin-bottom:9px;}
+.hl{background:rgba(45,106,79,0.07);border-right:3px solid #40916c;
+  padding:7px 11px;margin:9px 0;border-radius:0 4px 4px 0;font-style:italic;}
+.bl{list-style:none;padding:0;margin:8px 0;}
+.bl li{font-family:'Amiri',serif;color:var(--text);
+  font-size:clamp(0.82rem,1.9vw,0.93rem);line-height:1.9;
+  padding-right:16px;position:relative;margin-bottom:4px;}
+.bl li::before{content:'';position:absolute;right:3px;top:11px;
+  width:6px;height:6px;border-radius:50%;background:var(--accent);}
+
+/* PAYWALL */
+.paywall-page{position:absolute;inset:0;background:var(--page);
+  border-radius:0 8px 8px 0;display:none;flex-direction:column;
+  align-items:center;justify-content:center;padding:28px 22px;text-align:center;
+  box-shadow:4px 4px 20px rgba(124,74,30,0.12);animation:pageIn 0.3s ease forwards;}
+.paywall-page.active{display:flex;}
+.pw-icon{font-size:44px;margin-bottom:12px;}
+.pw-title{font-family:'Amiri',serif;color:var(--text);font-size:1.3rem;margin-bottom:8px;}
+.pw-sub{color:var(--text2);font-size:0.82rem;line-height:1.7;margin-bottom:16px;}
+.pay-box{width:100%;background:var(--page2);border:1px solid var(--border);
+  border-radius:10px;padding:16px;margin-bottom:10px;}
+.pay-label{font-size:0.7rem;color:var(--accent);font-weight:700;letter-spacing:1px;margin-bottom:8px;}
+.rip-num{background:#fff;border:1px solid var(--border);border-radius:6px;
+  padding:10px 14px;font-family:monospace;font-size:0.85rem;color:var(--text);
+  letter-spacing:1px;direction:ltr;margin-bottom:6px;word-break:break-all;}
+.pay-price{font-size:1.1rem;font-weight:700;color:var(--accent);margin-bottom:4px;}
+.pay-note{font-size:0.74rem;color:#999;line-height:1.5;}
+.divider{color:#ccc;font-size:0.8rem;margin:10px 0;}
+.wa-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;
+  background:#25D366;color:#fff;border-radius:8px;text-decoration:none;
+  font-family:'Cairo',sans-serif;font-weight:700;font-size:0.88rem;transition:opacity 0.2s;}
+.wa-btn:hover{opacity:0.85;}
+
+/* BACK */
+.back-wrap{flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:24px;}
+.back-quote{font-family:'Amiri',serif;color:rgba(245,230,200,0.85);
+  font-size:1rem;line-height:2;text-align:center;font-style:italic;
+  padding:18px;border:1px solid rgba(196,135,79,0.2);border-radius:8px;margin-bottom:14px;}
+
+/* CONTROLS */
+#controls{position:fixed;bottom:0;left:0;right:0;
+  display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 20px;
+  background:linear-gradient(to top,rgba(237,232,220,0.98),transparent);}
+.ctrl-btn{width:44px;height:44px;border-radius:50%;
+  background:rgba(45,106,79,0.1);border:1px solid var(--border);
+  color:var(--accent);font-size:1.1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all 0.2s;}
+.ctrl-btn:hover{background:var(--accent);color:#fff;border-color:var(--accent);}
+.ctrl-btn:disabled{opacity:0.25;cursor:default;}
+.page-indicator{color:var(--text2);font-size:0.76rem;min-width:70px;text-align:center;opacity:0.6;}
+.book-stage{user-select:none;}
+
+/* FLOATING WHATSAPP */
+#waFloat {
+  position: fixed;
+  bottom: 70px;
+  left: 20px;
+  z-index: 200;
+  display: none;
+}
+#waFloat a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #25D366;
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 30px;
+  text-decoration: none;
+  font-family: 'Cairo', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  box-shadow: 0 4px 15px rgba(37,211,102,0.4);
+  transition: all 0.2s;
+}
+#waFloat a:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px rgba(37,211,102,0.5);
+}
+</style>
+</head>
+<body>
+
+<div id="accessModal" style="display:none!important">
+  <div class="modal-box">
+    <div class="modal-icon">📖</div>
+    <h2>الطبيعة أ ربيعة</h2>
+    <div class="modal-sub">رحلة في عمق الجينات والمجتمع<br><small style="color:#aaa">أدخل كود الدخول الخاص بك</small></div>
+    <input type="text" id="codeInput" placeholder="كود الدخول" maxlength="12" dir="ltr">
+    <button onclick="checkCode()">دخول للكتاب</button>
+    <div class="modal-error" id="codeError"></div>
+  </div>
+</div>
+
+<div id="langBar" style="display:none">
+  <button class="lang-btn active" onclick="setLang('d',this)">🇲🇦 دارجة</button>
+  <button class="lang-btn" onclick="setLang('a',this)">🇸🇦 عربية</button>
+  <button class="lang-btn" onclick="setLang('f',this)">🇫🇷 Français</button>
+  <button class="lang-btn" onclick="setLang('e',this)">🇬🇧 English</button>
+  <button class="lang-btn" onclick="setLang('s',this)">🇪🇸 Español</button>
+  <button class="lang-btn" onclick="setLang('zh',this)">🇨🇳 中文</button>
+</div>
+
+
+<!-- FLOATING WHATSAPP -->
+<div id="waFloat" style="display:none">
+  <a href="https://wa.me/212635924374?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D8%8C%20%D8%A8%D8%BA%D9%8A%D8%AA%20%D9%86%D8%B4%D8%B1%D9%8A%20%D8%A7%D9%84%D9%83%D8%AA%D8%A7%D8%A8" target="_blank">
+    💬 WhatsApp
+  </a>
+</div>
+
+<div id="bookWrap" style="display:none">
+  <div class="book-stage" id="bookStage">
+    <div class="book">
+      <div class="spine"><div class="spine-text">الطبيعة أ ربيعة • RVR & Abdo Moka</div></div>
+      <div class="pages-area" id="pagesArea"></div>
+    </div>
+  </div>
+</div>
+
+<div id="controls" style="display:none">
+  <button class="ctrl-btn" id="prevBtn" onclick="nav('prev')">&#8594;</button>
+  <span class="page-indicator" id="pageInd">1 / 1</span>
+  <button class="ctrl-btn" id="nextBtn" onclick="nav('next')">&#8592;</button>
+</div>
+
+<script>
+const ADMIN_CODE="RVRMASTER2025", RIP="00748000063953004005781", WA="212635924374";
+function isValidCode(v){
+  if(v===ADMIN_CODE)return true;
+  const codes=JSON.parse(localStorage.getItem('rvr_codes')||'[]');
+  return codes.includes(v);
+}
+const FREE=3;
+let pg=0, lang='d', unlocked=false;
+
+const T={
+  cover:{
+    d:['الطبيعة','أ ربيعة','رحلة فعمق الجينات والمجتمع','المثلية • الجينات • المجتمع • التطور'],
+    a:['الطبيعة','يا ربيعة','رحلة في أعماق الجينات والمجتمع','المثلية • الجينات • المجتمع'],
+    f:['La Nature','ô Rabia','Un voyage au cœur des gènes','Homosexualité • Gènes • Société'],
+    e:['Nature,','O Rabia','A Journey into Genes and Society','Homosexuality • Genes • Society'],
+    s:['Naturaleza,','Oh Rabia','Un viaje al corazón de los genes','Homosexualidad • Genes • Sociedad'],
+    zh:['自然，','哦 Rabia','探索基因与社会的深度','同性恋 • 基因 • 社会']
+  },
+  ch:{
+    mq:{d:'المقدمة',a:'المقدمة',f:'Introduction',e:'Introduction',s:'Introducción',zh:'引言'},
+    c1:{d:'ف1: من الأصل تال البروستات',a:'الفصل الأول',f:'Chapitre 1',e:'Chapter 1',s:'Capítulo 1',zh:'第一章'},
+    c2:{d:'ف2: الجانب النفسي',a:'الفصل الثاني',f:'Chapitre 2',e:'Chapter 2',s:'Capítulo 2',zh:'第二章'},
+    c3:{d:'ف3: أنواع المثلية',a:'الفصل الثالث',f:'Chapitre 3',e:'Chapter 3',s:'Capítulo 3',zh:'第三章'},
+    c4:{d:'ف4: نربطو النقط',a:'الفصل الرابع',f:'Chapitre 4',e:'Chapter 4',s:'Capítulo 4',zh:'第四章'},
+    kh:{d:'الخاتمة',a:'الخاتمة',f:'Conclusion',e:'Conclusion',s:'Conclusión',zh:'结语'}
+  }
+};
+
+const pages=[
+{type:'cover'},
+
+// MQ1
+{type:'inner',ch:'mq',n:1,c:{
+d:`<p>أفين، هانية؟ مزيان؟ أش كتعاود؟ كلشي بيخير؟ الوالدة، الخوت، كلشي مزيان؟ إيوا الحمد لله.</p>
+<p>داك خونا اللي فيه الصواب بزاف بحال العيالات، هههه، لا غير ضاحكين. داكشي ما عندو حتى علاقة بدوك خوتنا الله ينجينا منهم اللي كيوليو بحال العيالات، كيبقاو بيناتهم: "كيفاش أختي؟"، وهو كيدوي مع عشيرو! زعما شي ناس الله يهديهم. وبلا ما نهدرو على هداك اللي بلحيتو وكي… راك تَمّ، خبار فراسك.</p>
+<p>وبزاف ديال الحوايج بحال هكا، بالأخص مؤخراً، ولى كيبان ليك كاع الناس صحراوي، مكرّد وكي… فهمتي؟ وكتلقى واحد إمام كيعجبوه الدراري! وزيد عليها، حنا عارفين أن الناس كتلقى واحد النوعية كتشابه، ونوعية عاود كتشابه، وكاين عندنا نوعيات خرين، وكتلاحظ فگاع هاد الجينوس كاين فالدومين ديال الگاي. هادشي ماشي نورمال أخويا، فين كنا وفين ولينا!</p>`,
+a:`<p>يا هلا، كيف الحال؟ عساك طيب؟ الأمور زينة؟ الوالدة، الإخوان، كلهم بخير؟ الحمد لله.</p>
+<p>ذاك الخوي اللي فيه رسميات واجد ومجاملات كأنه من الحريم، ههههه… لا لا، أمزح معك! الله يكفينا شر هالنوعية اللي يقلبون حريم، تلقاهم يقولون لبعض "يا أختي" وهو يكلم خويه—يا رجل، فيه ناس يبيلهم هداية من جد! وخلنا ما نتكلم عن ذاك اللي بلحيته وهو… عاد أنت خابر.</p>
+<p>خاصة بالفترة الأخيرة، ممكن تشوف لك واحد صحراوي معضل وجسمه يفجع، وتكتشف بالنهاية إنه إمام وميوله للعيال. وتلاحظ إن كل هالنوعيات طايحين في هالمجال حق الشذوذ. هالموضوع مو طبيعي يا خوي. وين كنا ووين صرنا!</p>`,
+f:`<p>Salut, ça roule ? Tout va bien ? Ta mère, tes frères, tout le monde va bien ? Dieu merci.</p>
+<p>Ce mec qui fait trop de manières comme les meufs, mdrrr… non, je déconne ! Que Dieu nous préserve de ces gars-là qui deviennent comme des meufs, qui s'appellent "ma sœur" entre eux—genre, sérieusement, certains ont vraiment besoin d'être guidés ! Et ne parlons même pas de celui avec la barbe qui est… bref, t'as capté.</p>
+<p>Surtout dernièrement, tu peux voir un gars du Sahara, musclé et tout, et tu découvres que c'est un imam qui kiffe les garçons. Tu remarques que tous ces types-là sont dans le délire gay. C'est pas normal, mon frère. Regarde où on était et où on en est maintenant !</p>`,
+e:`<p>Hey, is everything good? How are you doing? Everything fine? Your mom, the siblings, everyone's good? Thank God.</p>
+<p>That dude who acts overly polite like ladies, lol… nah, just joking! That has absolutely nothing to do with it. May God protect us from those guys who turn into women, constantly calling each other "sister" while talking to their buddies—like, seriously, some people need guidance! And let's not even talk about the guy with a beard who is… well, you know the drill.</p>
+<p>And many things like that. Especially lately, you might see a tough Sahrawi guy, muscular and all, and you find out he's an imam who likes boys. Add to that the fact that we know people often find similar types, and there are other types too. You notice that all these types are in the gay domain. This isn't normal, bro. Look where we were and where we are now!</p>`
+,s:`<p>Hola, ¿qué tal? ¿Cómo va todo? ¿Tu madre, tus hermanos, todos bien? Gracias a Dios.</p>
+<p>Ese tío que se pasa de educado como las mujeres, jajaja… ¡no, es broma! Que Dios nos libre de esos tíos que se vuelven como mujeres, que se llaman "hermana" entre ellos—¡algunos necesitan que los guíen! Y ni hablemos del tío con barba que es… bueno, ya sabes.</p>
+<p>Especialmente últimamente, puedes ver a un saharaui duro, musculoso y todo, y resulta que es un imán al que le gustan los chicos. Te das cuenta de que todos estos tipos están en el mundo gay. Esto no es normal, hermano. ¡Mira dónde estábamos y dónde estamos ahora!</p>`
+,zh:`<p>嘿，哥们，最近好吗？一切都好吗？你妈，你兄弟姐妹，大家都好吗？谢天谢地。</p>
+<p>那个像女人一样客气过头的家伙，哈哈哈……不，开玩笑的！愿上帝保佑我们远离那些变得像女人的家伙，他们跟哥们说话时居然互叫"姐妹"——说真的，有些人真的需要被拯救！更别提那个长胡子的家伙……好吧，你懂的。</p>
+<p>特别是最近，你可能会看到一个强壮、肌肉发达的撒哈拉硬汉，结果发现他是个喜欢男生的伊玛目。你会发现所有这些类型的人都在同性恋的圈子里。这不正常，兄弟。看看我们以前在哪，现在又在哪！</p>`
+}},
+
+// MQ2
+{type:'inner',ch:'mq',n:2,c:{
+d:`<p>ولكن مافيها باس جبدنا هاد الموضوع، أجي نتفلسفو فيه شوية، ما خاسرين والو. وأنا بيني وبينك داير ليك هاد الدخلة غير باش نجبد معاك هاد الموضوع، أنا ما قصدتك والمقصود الله، ماعليناش، هههه.</p>
+<p>فهاد السنوات الأخيرة، ولات المثلية الجنسية واحد الموضوع حاضر بقوة فالنقاش العالمي، ولى كيتطرح حتى فالمجتمعات العربية والإسلامية اللي كانت ديما كتشوف فيه تابو وممنوع نهائياً. ومع أن القانون فبلدان بحال المغرب مازال كيعاقب على العلاقات المثلية بين الأشخاص من نفس الجنس، إلا أن وجودها فالمجتمع واقع ما يمكنش إنكاره، وكتبان آثاره فالحياة اليومية، فالإعلام، وفنقاشات الشباب فالسوشيال ميديا.</p>
+<p>فهاد الكتاب غادي نحاولو أنا وياك نفهمو العمق ديال هادشي. ملي كتسمع لشي حد، كتحاول تفهم وتربط، هنا فاش الدماغ كيبدا يوسّع ويطوّر. ومع الوقت أكيد كتخدم فدماغك واحد البطونة سميتها "لوجيك". صافي، كتولي كلشي كتحلّلو بالمنطق.</p>`,
+a:`<p>بس ما يخالف، طالما فتحنا السالفة، خلنا نتفلسف فيها شوي—ترا ما ورانا شيء نخسره. وبيني وبينك، أنا ما سويت هالمقدمة إلا عشان أفتح معك هالموضوع. أنا ماني قاصدك، أنا مقصدي وجه الله والصدق. المهم، ههههه.</p>
+<p>في السنوات الأخيرة، صار المثلية الجنسية موضوع حاضر بقوة في النقاشات العالمية. وصار ينطرح حتى في المجتمعات العربية والإسلامية اللي كانت دايم تشوفه تابو وممنوع قطعياً. ورغم إن القانون في دول زي المغرب لسه يعاقب على العلاقات المثلية، إلا إن وجودها في المجتمع واقع ما نقدر ننكره.</p>
+<p>مخك يبدأ يشتغل ويحلل الكلام لما تسمعه؛ تحاول تفهم وتربط الأمور ببعض. هنا المخ يبدأ يتوسع ويتطور. ومع الوقت، أكيد راح تفعل زر في مخك اسمه "المنطق". وهذا بالضبط اللي أبيك تسويه معي. اتفقنا؟</p>
+<p>في هالكتاب، أنا وأنت راح نحاول نفهم عمق هالموضوع. لا تحكم الحين. خلنا نمشي حبة حبة، وبعدين احكم براحتك.</p>`,
+f:`<p>Mais c'est pas grave, puisqu'on a abordé le sujet, philosophons un peu—on n'a rien à perdre. Et entre toi et moi, j'ai juste fait cette intro pour aborder ce sujet avec toi. Je ne te vise pas, je ne vise que la vérité de Dieu. Bref, mdr.</p>
+<p>Ces dernières années, l'homosexualité est devenue un sujet très présent dans les débats mondiaux. Ça s'invite même dans les sociétés arabes et islamiques, qui l'ont toujours considéré comme un tabou strict et complètement interdit. Même si la loi dans des pays comme le Maroc punit toujours les relations homosexuelles, leur existence dans la société est une réalité indéniable.</p>
+<p>Quand tu écoutes quelqu'un, tu essaies de comprendre et de faire des liens. C'est là que le cerveau s'élargit et se développe. Avec le temps, tu actives forcément un bouton dans ton cerveau qui s'appelle "Logique." C'est exactement ce que je veux que tu fasses avec moi. D'accord ?</p>
+<p>Dans ce bouquin, toi et moi, on va essayer de comprendre la profondeur de ce truc. Ne juge pas tout de suite. Allons-y doucement, et tu pourras juger après.</p>`,
+e:`<p>But it's fine, since we brought up the topic, let's philosophize about it a bit—we have nothing to lose. And just between you and me, I only made this intro to bring up this topic with you. I'm not targeting you, I'm only targeting God's truth. Anyway, lol.</p>
+<p>In recent years, homosexuality has become a strongly present topic in global discussions. It's even being brought up in Arab and Islamic societies, which always viewed it as a strict taboo and completely forbidden. Even though the law in countries like Morocco still punishes same-sex relationships, their existence in society is an undeniable reality. You can see its effects in daily life, in the media, and in youth discussions on social media.</p>
+<p>When you listen to someone, you try to understand and connect things. That's when the brain expands and develops. Over time, you definitely activate a button in your brain called "Logic." Then, you analyze everything with logic. That's exactly what I want you to do with me. Deal?</p>
+<p>In this book, you and I will try to understand the depth of this issue. Don't judge now. Let's take it step by step, and then you can judge.</p>`
+,s:`<p>Pero bueno, ya que sacamos el tema, vamos a filosofar un poco—no tenemos nada que perder. Entre tú y yo, solo hice esta intro para sacar este tema contigo. No voy a por ti, solo busco la verdad de Dios. En fin, jajaja.</p>
+<p>En los últimos años, la homosexualidad se ha convertido en un tema muy presente en los debates mundiales. Incluso se debate en las sociedades árabes e islámicas, que siempre lo vieron como un tabú estricto y completamente prohibido. Aunque la ley en países como Marruecos todavía castiga las relaciones homosexuales, su existencia en la sociedad es una realidad innegable.</p>
+<p>Cuando escuchas a alguien, intentas entender y conectar cosas. Ahí es cuando el cerebro se expande y se desarrolla. Con el tiempo, activas un botón en tu cerebro llamado "Lógica". Eso es exactamente lo que quiero que hagas conmigo. ¿Trato hecho?</p>
+<p>En este libro, tú y yo vamos a intentar entender la profundidad de este asunto. No juzgues ahora. Vamos paso a paso, y luego ya podrás juzgar.</p>`
+,zh:`<p>不过没关系，既然我们提到了这个话题，那我们就来稍微探讨一下人生哲学吧——反正我们也没什么损失。就在你我之间说，我写这段开场白就是为了跟你聊这个话题。我不是在针对你，我只是在追求上帝的真理。总之，哈哈哈。</p>
+<p>近年来，同性恋已成为全球讨论中非常热门的话题。它甚至在阿拉伯和伊斯兰社会中被提及，而这些社会一直将其视为严格的禁忌。尽管在摩洛哥等国家，法律仍然会惩罚同性关系，但它们在社会中的存在是一个不可否认的现实。</p>
+<p>当你倾听时，你的大脑开始分析词语；你试图理解并建立联系。这就是大脑扩展和发展的时候。随着时间的推移，你肯定会在大脑中激活一个叫做"逻辑"的按钮。这就是我希望你跟我一起做的事情。成交？</p>
+<p>在这本书中，你和我都将尝试去理解这个问题的深度。现在先别下定论。我们一步一步来，然后你再做判断。</p>`
+}},
+
+// MQ3 - PAYWALL
+{type:'inner',ch:'mq',n:3,c:{
+d:`<p>مثلاً، كيفاش كتستنتج إلى لاحظتي نتا كتحس بميول جنسي ولكن فنفس الوقت كتبقى تقول: "مافهمتش أنا مالي؟ واش أنا بوحدي اللي هاكا؟" إذن أنا هو هاداك الشخص اللي كيعيطو عليه بذاك المصطلح، راك عارف، بلا ما نگولو حشمنا منك هههه.</p>
+<p>وداك المصطلح مطروح على الواقع كاين، إذن كتستنتج: أنا حيت كاين وشائع وعندو اهتمام كبير، أنك راه ماشي بوحدك. وأن هادشي يقدر يكون عندو علاقة بالجينات مثلاً، أو بالمجتمع اللي عايش فيه، أو هرمونات.</p>
+<p>دابا أنا وياك شنو غانديرو؟ غانحاولو نعطيو فرصة لجانب خور، وحتى نتا عطيني فرصة نقوليك اشنو استنتجت. نتا ما خاسر والو، ما خاسر والو أعشيري! يالاه نبداو نطرحو أسئلة ونكشيو مع بعضياتنا.</p>`,
+a:`<p>مثلاً… دقيقة، أنا ما قلت شيء، ههههه! فمثلاً، كيف تستنتج هالشيء؟ لو لاحظت إنك تحس بميول جنسي، بس بنفس الوقت قاعد تقول: "أنا ماني فاهم وش فيني، هل أنا الوحيد اللي كذا؟" بعدين تستوعب: "آها، أجل أنا من النوعية اللي يسمونهم بذاك المصطلح"—عاد أنت عارفه، ما يحتاج نقوله، مستحين منك، ههههه.</p>
+<p>وهالمصطلح تراه واقع وموجود. فبما إنه موجود، ومنتشر، تستنتج إنك مو لحالك. وهالشيء ممكن يكون له علاقة بالجينات، أو بالمجتمع، أو الهرمونات.</p>
+<p>اللي راح نسويه أنا وأنت هو إننا نعطي فرصة لجانب ثاني. ما راح تخسر شيء! خلنا نبدأ نطرح الأسئلة ونفك هالعقدة مع بعض.</p>`,
+f:`<p>Par exemple… attends, j'ai rien dit, mdr ! Comment tu conclus ça ? Si tu remarques que tu ressens une attirance sexuelle, mais qu'en même temps tu te dis : "Je ne comprends pas ce qui m'arrive, est-ce que je suis le seul comme ça ?" Et puis tu réalises : "Ah, donc je suis ce genre de personne qu'on appelle par ce terme"—tu connais le terme, pas besoin de le dire, on est trop timides, mdr.</p>
+<p>Et ce terme, c'est une réalité ; ça existe. Donc, tu conclus que puisque ça existe et que c'est répandu, tu n'es pas seul. Et ce truc pourrait être lié à la génétique, à la société dans laquelle tu vis, ou aux hormones.</p>
+<p>Ce qu'on va faire, toi et moi, c'est donner une chance à une autre perspective. Tu n'as rien à perdre ! Commençons à poser des questions et à décortiquer tout ça ensemble.</p>`,
+e:`<p>For example… wait, I didn't say it, lol! So, how do you conclude this? If you noticed that you feel sexual attraction, but at the same time you keep saying, "I don't understand what's wrong with me, am I the only one like this?" Then you realize, "Ah, so I'm that kind of person they call by that term"—you know the one, no need to say it, we're too shy, lol.</p>
+<p>And that term is a reality; it exists. So, you conclude that since it exists and is widespread, you're not alone. And this thing could be related to genetics, the society you live in, or hormones—just like doctors in this field have mentioned.</p>
+<p>Now, what you and I are going to do is give another perspective a chance. You have nothing to lose! Let's start asking questions and figure this out together.</p>`
+,s:`<p>Por ejemplo… ¡espera, no lo dije, jajaja! ¿Cómo concluyes esto? Si notaste que sientes atracción sexual, pero al mismo tiempo sigues diciendo: "No entiendo qué me pasa, ¿soy el único así?" Entonces te das cuenta: "Ah, así que soy ese tipo de persona a la que llaman por ese término"—ya sabes cuál, no hace falta decirlo, somos demasiado tímidos, jajaja.</p>
+<p>Y ese término es una realidad; existe. Así que concluyes que, dado que existe y está extendido, no estás solo. Y esto podría estar relacionado con la genética, la sociedad en la que vives, o las hormonas.</p>
+<p>Lo que vamos a hacer, tú y yo, es darle una oportunidad a otra perspectiva. ¡No tienes nada que perder! Empecemos a hacer preguntas y a descifrar todo esto juntos.</p>`
+,zh:`<p>比如……等等，我什么都没说，哈哈哈！那么，你是怎么得出这个结论的？如果你注意到你感到了性吸引，但同时你又在说："我不明白我怎么了，难道只有我这样吗？"然后你意识到，"啊，原来我就是他们用那个词称呼的那种人"——你知道哪个词，没必要说出来，我们太害羞了，哈哈哈。</p>
+<p>而这个词是一个现实；它是存在的。所以，你得出的结论是，既然它存在、很普遍，你就不是一个人。这可能与基因、你生活的社会或荷尔蒙有关。</p>
+<p>现在，你和我要做的是给另一个视角一个机会。你没什么损失！让我们开始提问，一起搞清楚这一切。</p>`
+}},
+
+// PAYWALL
+{type:'paywall'},
+
+// C1-1
+{type:'inner',ch:'c1',n:4,c:{
+d:`<div class="ch-title">الفصل الأول: من الأصل تال البروستات</div>
+<p>نرجعو شوية للّور، نبداو من الأصل. كُلنا كنعرفو أن حنا جينا على تطوُّر. هنا غاتفكر شوية وتطرح سؤال: واش حتى الأعضاء والأماكن ديالها عقلو على هاد الأماكن دابا ورجعولها؟</p>
+<p>واش تقدر المثلية تكون عندها علاقة بهادشي؟ أنا غانجي وندير فيها فيلسوف ونقولك: آه كاين، ممكن. حنا نحطو الأدلة ديالي وانت شوف.</p>
+<p>عمرك تساءلتي وگلتي: <strong>علاش البروستات جاية جهة الدبر؟</strong> بلُغتنا حنا "الخرزة". على حساب النظرية ديالي، غاتقولي: كون كانت صحيحة، البروستات ما محتاجاش تكون مشاركة، راه عندها واحد الدور آخر. أنا بالنسبة ليا، النقطة الأقرب بيناتهم هي هاديك.</p>
+<p>البروستات هي واحد الغدة صغيرة، الحجم ديالها بحال شي كركاعة ولا مشماشة (فيها تقريباً بين 11 حتى 20 غرام عند الراجل البالغ)، وكاينة غير عند الرجال. البلاصة ديالها: كاينة نيشان تحت المثانة، وقدام المستقيم.</p>`,
+a:`<div class="ch-title">الفصل الأول: من الأصل لين البروستاتا</div>
+<p>خلنا نرجع شوي للوراء، نبدأ من الأساس. كلنا عارفين إننا جينا نتيجة التطور. هنا راح تفكر وتسأل نفسك: حتى الأعضاء ومواقعها، هل تطورت وصارت في أماكنها الحالية؟</p>
+<p>هل ممكن تكون المثلية ما لها علاقة بهالشيء؟ راح تضحك علي وتقول: "وش قاعد تقول؟" ما يخالف، أنا بس أتفلسف، عطني فرصة أشرح لك وبعدين احكم، أوكي؟</p>
+<p>هل سألت نفسك يوم: <strong>ليش البروستاتا جاية جهة الدبر؟</strong> بلغتنا: "الحبة". حسب نظريتي، لو كانت صح، البروستاتا ما كانت تحتاج تكون موجودة هناك—عندها دور ثاني. بالنسبة لي، أقرب نقطة بينهم هي هذي.</p>
+<p>البروستاتا غدة صغيرة، حجمها مثل جوزة أو مشمشة تقريباً (حوالي 11 لين 20 غرام عند الرجل البالغ)، وموجودة بس عند الرجال. مكانها: تحت المثانة مباشرة، وقدام المستقيم.</p>`,
+f:`<div class="ch-title">Chapitre 1 : De l'origine à la prostate</div>
+<p>Revenons un peu en arrière, commençons depuis le début. On sait tous qu'on est issus de l'évolution. Tu vas te poser une question : même les organes et leurs positions ont-ils évolué pour être là où ils sont aujourd'hui ?</p>
+<p>L'homosexualité pourrait-elle avoir un lien avec ça ? Tu vas me rire au nez et dire : "T'es en train de délirer ?" C'est bon, je philosophe juste, donne-moi une chance d'expliquer et tu jugeras après, ok ?</p>
+<p>T'es-tu jamais demandé : <strong>pourquoi la prostate se trouve du côté de l'anus ?</strong> Dans notre langue : "la perle." Selon ma théorie, si elle est correcte, la prostate n'avait pas besoin d'être impliquée là—elle a un autre rôle. Pour moi, le point le plus proche entre eux, c'est exactement ça.</p>
+<p>La prostate est une petite glande, à peu près de la taille d'une noix ou d'un abricot (environ 11 à 20 grammes chez un homme adulte), et elle n'existe que chez les hommes. Sa localisation : juste en dessous de la vessie, et devant le rectum.</p>`,
+e:`<div class="ch-title">Chapter 1: From the Origin to the Prostate</div>
+<p>Let's go back a little, start from the beginning. We all know that we came through evolution. Here you'll think a bit and ask yourself: did even the organs and their positions evolve to be where they are now?</p>
+<p>Could homosexuality have a connection to this? You're going to laugh at me and say: "What are you talking about?" It's fine, I'm just philosophizing, give me a chance to explain and then you judge, okay?</p>
+<p>Have you ever asked yourself: <strong>why is the prostate located near the anus?</strong> In our language: "the bead." According to my theory, if it were correct, the prostate didn't need to be involved there—it has a different role. In my opinion, the closest point between them is exactly that.</p>
+<p>The prostate is a small gland, about the size of a walnut or apricot (roughly 11 to 20 grams in an adult male), and it only exists in men. Its location: right below the bladder, and in front of the rectum.</p>`
+,s:`<div class="ch-title">Capítulo 1: Del origen a la próstata</div>
+<p>Volvamos un poco atrás, empecemos desde el principio. Todos sabemos que venimos de la evolución. Te harás una pregunta: ¿incluso los órganos y sus posiciones evolucionaron para estar donde están hoy?</p>
+<p>¿Podría la homosexualidad tener conexión con esto? Te vas a reír y dirás: "¿De qué estás hablando?" Está bien, solo estoy filosofando, dame la oportunidad de explicar y luego juzgas, ¿ok?</p>
+<p>¿Te has preguntado alguna vez: <strong>¿por qué la próstata se encuentra cerca del ano?</strong> En nuestro lenguaje: "la perla". Según mi teoría, si fuera correcta, la próstata no necesitaba estar implicada ahí—tiene otro papel. Para mí, el punto más cercano entre ellos es exactamente ese.</p>
+<p>La próstata es una glándula pequeña, del tamaño aproximado de una nuez o un albaricoque (aproximadamente 11 a 20 gramos en un hombre adulto), y solo existe en los hombres. Su ubicación: justo debajo de la vejiga, y delante del recto.</p>`
+,zh:`<div class="ch-title">第一章：从起源到前列腺</div>
+<p>让我们稍微回顾一下，从头开始。我们都知道我们来自进化。你会思考并问自己：连器官及其位置也进化到了现在这个样子吗？</p>
+<p>同性恋可能与此有关？你会笑着说："你在说什么？"没关系，我只是在哲学化，给我一个解释的机会，然后你来判断，好吗？</p>
+<p>你有没有问过自己：<strong>前列腺为什么位于肛门附近？</strong>用我们的语言来说："珠子"。根据我的理论，如果它是正确的，前列腺本不需要被牵扯进去——它有另一个作用。对我来说，它们之间最近的点就是那里。</p>
+<p>前列腺是一个小腺体，大约是核桃或杏子的大小（成年男性约11至20克），只存在于男性体内。它的位置：就在膀胱下方，直肠前面。</p>`
+}},
+
+// C1-2
+{type:'inner',ch:'c1',n:5,c:{
+d:`<p>هنا بانت ليا ثغرة: يقدر تكون هاديك هي أقرب position ديالها، ويكون عندها دور ثانوي. مايكونش الذكر عبر التطور كان كيمارس المثلية من الخلف، وهي اللي خلات البروستات يجي قريب من القضيب؟</p>
+<div class="hl">وبشكل أعمق، تقدر تكون حتى المسافة عندها علاقة برياضيات الجنس:
+<ul class="bl" style="margin-top:6px">
+<li>المسافة بين البروستات (مسؤولة على النشوة) والقضيب: من 5 تال 7 سم</li>
+<li>المسافة بينها وبين فتحة الدبر: 2 سم فقط</li>
+</ul></div>
+<p>هنا عاوتاني كاتقول: واش كيمارس من اللور كتر من القضيب؟ حنا كندويو عبر تاريخ المخلوقات.</p>
+<p>ممكن يكون مع الوقت ما بقاتش غير دور التكاثر، بداو يتأكتيفاو المشاعر والأحاسيس، ولات المتعة بحد ذاتها عايشة فالجسد. مع الوقت، ممكن الرجل بدا يحس بالانجذاب جيهة الرجل لأسباب نفسية مثلاً، كايبغي يحس معاه براجل فحياتو.</p>
+<p>حنا كنستنتجو أنا وياك، ماكنقولش هادي هي الحقيقة المطلقة، مجرد استنتاجات.</p>`,
+a:`<p>هنا شفت ثغرة: ممكن هذا يكون بس أقرب موضع لها، ويكون عندها دور ثانوي. ما يكون الذكر، عبر التطور، كان يمارس المثلية من الخلف، وهذا اللي خلى البروستاتا تجي قريبة من العضو الذكري؟</p>
+<div class="hl">وبشكل أعمق، ممكن حتى المسافة تكون لها علاقة برياضيات الجنس:
+<ul class="bl" style="margin-top:6px">
+<li>المسافة بين البروستاتا (المسؤولة عن النشوة) والعضو الذكري: من 5 لين 7 سم</li>
+<li>المسافة بينها وبين فتحة الدبر: 2 سم بس</li>
+</ul></div>
+<p>هنا عاد تستنتج: هل "الممارسة من الخلف" كانت أكثر انتشاراً تاريخياً في الحياة الجنسية للمخلوقات؟ إحنا بس نربط نقاط هنا، مو نقول هذي حقيقة مطلقة—مجرد استنتاجات.</p>
+<p>مو بعيد إنه مع الوقت، ما صار التكاثر هو الهدف الوحيد. المشاعر والأحاسيس بدأت تتفعل، والمتعة نفسها صارت راسخة في الجسم. ومع الوقت، ممكن الرجل بدأ يحس بانجذاب لرجل ثاني لأسباب نفسية—يبي يحس بتلك الحضور الرجولي والأمان في حياته.</p>`,
+f:`<p>C'est là que j'ai repéré une faille : il se pourrait que ce soit juste la position la plus proche pour elle, et qu'elle ait un rôle secondaire. Et si, au cours de l'évolution, les mâles pratiquaient l'homosexualité par derrière, et que c'est ce qui a rapproché la prostate du pénis ?</p>
+<div class="hl">Et à un niveau plus profond, même la distance pourrait être liée aux mathématiques du sexe :
+<ul class="bl" style="margin-top:6px">
+<li>La distance entre la prostate (responsable de l'orgasme) et le pénis : 5 à 7 cm</li>
+<li>La distance entre elle et l'ouverture anale : seulement 2 cm</li>
+</ul></div>
+<p>Là, tu conclus déjà : la "pratique par derrière" était-elle historiquement plus courante dans la vie sexuelle des créatures ? On relie juste des points ici, on ne prétend pas que c'est la vérité absolue—juste des conclusions.</p>
+<p>Il est très probable qu'avec le temps, la reproduction n'était plus le seul but. Les sentiments et les sensations ont commencé à s'activer, le plaisir s'est ancré dans le corps lui-même. Au fil du temps, un homme a pu commencer à ressentir une attirance pour un autre homme pour des raisons psychologiques—vouloir ressentir cette présence masculine et cette sécurité dans sa vie.</p>`,
+e:`<p>Here I spotted a gap: it could be that this is just the closest position for it, and it has a secondary role. What if, through evolution, males practiced homosexuality from behind, and that's what brought the prostate closer to the penis?</p>
+<div class="hl">And on a deeper level, even the distance could be related to the mathematics of sex:
+<ul class="bl" style="margin-top:6px">
+<li>The distance between the prostate (responsible for orgasm) and the penis: 5 to 7 cm</li>
+<li>The distance between it and the anal opening: only 2 cm</li>
+</ul></div>
+<p>Here you're already concluding: was the "rear practice" more common historically in the sexual life of creatures? We're just connecting dots here, not claiming this is absolute truth—just conclusions.</p>
+<p>It's very possible that over time, reproduction wasn't the only purpose anymore. Feelings and sensations started activating, pleasure became embedded in the body itself. Over time, a man could start feeling attracted to another man for psychological reasons—wanting to feel that male presence and security in his life.</p>`
+,s:`<p>Ahí es donde detecté una laguna: podría ser que esa sea simplemente la posición más cercana para ella, y que tenga un papel secundario. ¿Y si, a través de la evolución, los machos practicaban la homosexualidad por detrás, y eso es lo que acercó la próstata al pene?</p>
+<div class="hl">Y a un nivel más profundo, incluso la distancia podría estar relacionada con las matemáticas del sexo:
+<ul class="bl" style="margin-top:6px">
+<li>La distancia entre la próstata (responsable del orgasmo) y el pene: 5 a 7 cm</li>
+<li>La distancia entre ella y la apertura anal: solo 2 cm</li>
+</ul></div>
+<p>Ahí ya vas concluyendo: ¿era la "práctica por detrás" históricamente más común en la vida sexual de las criaturas? Solo estamos conectando puntos aquí, no afirmamos que sea la verdad absoluta—solo conclusiones.</p>
+<p>Es muy probable que con el tiempo, la reproducción no fuera el único propósito. Los sentimientos y sensaciones empezaron a activarse, el placer se arraigó en el propio cuerpo. Con el tiempo, un hombre pudo empezar a sentir atracción por otro hombre por razones psicológicas—querer sentir esa presencia masculina y seguridad en su vida.</p>`
+,zh:`<p>就在这里我发现了一个漏洞：它可能只是离那里最近的位置，并且有次要功能。如果说在进化过程中，雄性从后面实践同性恋，而这正是让前列腺靠近阴茎的原因呢？</p>
+<div class="hl">在更深层面上，距离也可能与性的数学有关：
+<ul class="bl" style="margin-top:6px">
+<li>前列腺（负责高潮）与阴茎之间的距离：5至7厘米</li>
+<li>它与肛门开口之间的距离：仅2厘米</li>
+</ul></div>
+<p>在这里你已经得出结论：历史上生物性生活中"后部实践"更为普遍吗？我们只是在连接点，不是声称这是绝对真理——只是结论。</p>
+<p>很可能随着时间的推移，繁殖不再是唯一的目的。感情和感觉开始被激活，快乐本身扎根于身体之中。随着时间的推移，一个男人可能开始因心理原因被另一个男人所吸引——想要在生活中感受到那种男性的存在和安全感。</p>`
+}},
+
+// C2-1
+{type:'inner',ch:'c2',n:6,c:{
+d:`<div class="ch-title">الفصل الثاني: الجانب النفسي وتاريخ الأحكام</div>
+<p>غانديرو الاستنتاج النهائي ديال داكشي اللي گلنا: استنتجنا أنه بما أن حنا عبارة على جينات وحنا غير واحد مجموعة ديال سلوكيات إنسانية وجسدية ديال الإنسان اللي فاتنا، فراه البروستات ما كانت مكانها تمة غير هكاك إلى عندها علاقة مباشرة.</p>
+<p>حنا حالياً راه اللي مخليينا على قيد الحياة وجيناتنا قوية باش تشبت بالبقاء، هي الأحاسيس والمشاعر: <strong>متعة، حزن، خوف، أمان…</strong> الحزن؟ راه حتى هو ضروري. كون ماكانش الحزن، كون الوجود ما عندو معنى.</p>
+<p>دابا حنا كنستنتجو أن حتى هاد الأحاسيس عندها علاقة مباشرة بالإنسان عبر التاريخ. والدوبامين هو اللي كيتفرز فاش كتكون فعلاقة جنسية. دماغك هنا كيدير:</p>
+<div class="hl">"اللي كيجيب ليا هاد الشعور = حاجة زوينة = نعاودها"</div>`,
+a:`<div class="ch-title">الفصل الثاني: الجانب النفسي وتاريخ الأحكام</div>
+<p>خلنا نلخص اللي قلناه: بما إننا في الأساس جينات، وإحنا مجرد مجموعة من السمات السلوكية والجسدية الموروثة من اللي جوا قبلنا، والجينات تتحدث كل مرة... البروستاتا وصلت لهناك لسبب مرتبط مباشرة بهالممارسات.</p>
+<p>الحين، اللي يخلينا نكمل في الحياة ويخلي جيناتنا قوية عشان تتمسك بالبقاء، هي المشاعر والأحاسيس: <strong>المتعة، الحزن، الخوف، الأمان…</strong> حتى الحزن ضروري. لو ما فيه حزن، الوجود ما صار له معنى.</p>
+<p>نقدر نستنتج إن حتى هالمشاعر لها علاقة مباشرة بالإنسان عبر التاريخ. والدوبامين هو اللي يتحرر لما تكون في علاقة جنسية. مخك يسوي ربط:</p>
+<div class="hl">"اللي يعطيني هالإحساس = شيء زين = راح أعيده"</div>`,
+f:`<div class="ch-title">Chapitre 2 : Le côté psychologique et l'histoire des jugements</div>
+<p>Concluons ce qu'on a dit : puisque nous sommes essentiellement des gènes, et qu'on n'est qu'un ensemble de traits comportementaux et physiques hérités de ceux qui nous ont précédés, et que les gènes se mettent à jour à chaque fois... la prostate s'est retrouvée là pour une raison directement liée à ces pratiques.</p>
+<p>En ce moment, ce qui nous maintient en vie et rend nos gènes assez forts pour s'accrocher à la survie, ce sont les émotions et les sentiments : <strong>le plaisir, la tristesse, la peur, la sécurité…</strong> Même la tristesse est nécessaire. Sans elle, l'existence n'aurait aucun sens.</p>
+<p>On peut conclure que même ces sentiments ont un lien direct avec l'humanité à travers l'histoire. Et la dopamine, c'est ce qui est libéré quand t'es dans une relation sexuelle. Ton cerveau fait une connexion :</p>
+<div class="hl">"Ce qui me donne ce sentiment = quelque chose de bien = je vais le refaire"</div>`,
+e:`<div class="ch-title">Chapter 2: The Psychological Side and the History of Judgments</div>
+<p>Let's wrap up the conclusion from what we said: since we are essentially genes, and we're just a collection of human behavioral and physical traits inherited from those who came before us, and genes update every time... the prostate ended up there for a reason directly connected to these practices.</p>
+<p>Right now, what keeps us alive and makes our genes strong enough to hold on to survival are emotions and feelings: <strong>pleasure, sadness, fear, security…</strong> Even sadness is necessary. If there was no sadness, existence would have no meaning—we'd just be running on empty.</p>
+<p>We can conclude that even these feelings have a direct connection to humanity across history. And dopamine is what gets released when you're in a sexual relationship. Your brain makes a connection:</p>
+<div class="hl">"Whatever gives me this feeling = a good thing = I'll do it again"</div>`
+,s:`<div class="ch-title">Capítulo 2: El lado psicológico y la historia de los juicios</div>
+<p>Concluyamos lo que dijimos: dado que somos esencialmente genes, y solo somos un conjunto de rasgos conductuales y físicos heredados de quienes nos precedieron, y los genes se actualizan cada vez... la próstata acabó ahí por una razón directamente relacionada con estas prácticas.</p>
+<p>En este momento, lo que nos mantiene vivos y hace que nuestros genes sean lo suficientemente fuertes para aferrarse a la supervivencia son las emociones y los sentimientos: <strong>el placer, la tristeza, el miedo, la seguridad…</strong> Incluso la tristeza es necesaria. Sin ella, la existencia no tendría sentido.</p>
+<p>Podemos concluir que incluso estos sentimientos tienen una conexión directa con la humanidad a lo largo de la historia. Y la dopamina es lo que se libera cuando estás en una relación sexual. Tu cerebro hace una conexión:</p>
+<div class="hl">"Lo que me da este sentimiento = algo bueno = lo haré de nuevo"</div>`
+,zh:`<div class="ch-title">第二章：心理层面与判断的历史</div>
+<p>让我们总结一下我们所说的：既然我们本质上是基因，我们只不过是从前人那里继承的一系列行为和身体特征的集合，基因每次都会更新……前列腺最终出现在那里是有原因的，与这些实践直接相关。</p>
+<p>目前，让我们保持活力并使我们的基因足够强大以坚持生存的，是情感和感觉：<strong>快乐、悲伤、恐惧、安全……</strong>即使是悲伤也是必要的。没有它，存在就没有意义。</p>
+<p>我们可以得出结论，即使是这些感觉也与历史上的人类有直接联系。而多巴胺就是在你处于性关系中时释放的东西。你的大脑建立了一个连接：</p>
+<div class="hl">"给我这种感觉的东西 = 好东西 = 我会再做一次"</div>`
+}},
+
+// C2-2
+{type:'inner',ch:'c2',n:7,c:{
+d:`<p>أجي نخربقو شوية فالآلاف العوام الماضية. حنا كلنا عارفين بأن المثلية عندها تاريخ موثق ومقبولة اجتماعياً.</p>
+<p>شنو دارو؟ ولات المثلية ممنوعة اجتماعياً. وكاين تفسيرين: اللي مؤمن بخالق إبراهيمي سيقول "حرام". واللي مقطع الوراق سيقول: ربما ناس كانت تريد التكاثر السريع وقررت تحريمها اجتماعياً ودينياً؟</p>
+<p>إذن كاين اختلاف بين الجينات والأحكام الاجتماعية. واللي بغينا نوصلو ليه: هاد الاختلاف هو اللي مخليك ما تتصالحش مع راسك.</p>
+<p>فاش كتشوف المجتمع والدين يرفض داكشي نهائياً، دماغك كيقول: "أنا ما كنبغيش الدراري." وهنا كيولد الكبت والمعاناة الداخلية.</p>`,
+a:`<p>خلنا ننبش شوي في آلاف السنين اللي فاتت. كلنا عارفين إن المثلية عندها تاريخ موثق وكانت مقبولة اجتماعياً. وش صار؟ صارت المثلية ممنوعة اجتماعياً. فيه تفسيرين: اللي يؤمن بإله إبراهيمي راح يقول "هذا حرام". واللي حر التفكير راح يقول: يمكن ناس بغوا تكاثر سريع وقرروا يحرمونها اجتماعياً ودينياً؟</p>
+<p>إذن فيه تعارض بين الجينات والأحكام الاجتماعية. واللي نبي نوصل له: هالتعارض هو بالضبط اللي يمنعك من تقبل نفسك والتصالح معها.</p>
+<p>لما تشوف إن المجتمع والدين يرفضون هالشيء نهائياً، مخك يقول لنفسه: "أنا ماني راعي عيال." وهنا يبدأ الكبت والمعاناة الداخلية.</p>`,
+f:`<p>Creusons un peu dans les millénaires passés. On sait tous que l'homosexualité a une histoire documentée et était socialement acceptée. Qu'est-ce qui s'est passé ? L'homosexualité est devenue socialement interdite. Il y a deux interprétations : celui qui croit en un Dieu abrahamique dira "c'est haram." Et le libre-penseur dira : peut-être que certaines personnes voulaient une reproduction rapide et ont décidé de l'interdire socialement et religieusement ?</p>
+<p>Donc il y a un conflit entre la génétique et les jugements sociaux. Et ce à quoi on veut arriver : ce conflit, c'est exactement ce qui t'empêche de te réconcilier avec toi-même.</p>
+<p>Quand tu vois que la société et la religion rejettent complètement ça, ton cerveau se dit : "Je suis pas fait pour les mecs." Et c'est là que le refoulement et la souffrance intérieure commencent.</p>`,
+e:`<p>Let's dig a little into the thousands of past years. We all know that homosexuality has a documented history and was socially accepted. What happened? Homosexuality became socially forbidden. There are two interpretations: whoever believes in an Abrahamic God will say "it's haram." And the freethinker will say: maybe some people wanted fast reproduction and decided to ban it socially and religiously?</p>
+<p>So there's a conflict between genetics and social judgments. And what we want to reach: this conflict is exactly what's keeping you from making peace with yourself.</p>
+<p>When you see that society and religion completely reject this, your brain tells itself: "I'm not into guys." And that's where the repression and internal suffering begin.</p>`
+,s:`<p>Escarbemos un poco en los miles de años pasados. Todos sabemos que la homosexualidad tiene una historia documentada y era socialmente aceptada. ¿Qué pasó? La homosexualidad se volvió socialmente prohibida. Hay dos interpretaciones: quien cree en un Dios abrahámico dirá "es haram". Y el librepensador dirá: ¿quizás algunas personas querían una reproducción rápida y decidieron prohibirla social y religiosamente?</p>
+<p>Entonces hay un conflicto entre la genética y los juicios sociales. Y a lo que queremos llegar: este conflicto es exactamente lo que te impide hacer las paces contigo mismo.</p>
+<p>Cuando ves que la sociedad y la religión rechazan esto por completo, tu cerebro se dice: "No soy de los chicos." Y ahí es donde empiezan la represión y el sufrimiento interno.</p>`
+,zh:`<p>让我们深入探讨数千年前的历史。我们都知道同性恋有有据可查的历史，曾经被社会接受。发生了什么？同性恋变成了社会禁忌。有两种解释：相信亚伯拉罕神的人会说"这是哈拉姆（禁忌）"。自由思想者会说：也许某些人想要快速繁殖，于是决定在社会和宗教层面将其禁止？</p>
+<p>所以基因和社会判断之间存在冲突。我们想要达到的是：这种冲突正是阻止你与自己和解的原因。</p>
+<p>当你看到社会和宗教完全拒绝这一点时，你的大脑对自己说："我不适合男生。"就在这里，压抑和内心痛苦开始了。</p>`
+}},
+
+// C3-1
+{type:'inner',ch:'c3',n:8,c:{
+d:`<div class="ch-title">الفصل الثالث: أنواع المثلية والشخصية</div>
+<p>دابا حالياً، عندنا أنواع ديال المثليين:</p>
+<ul class="bl">
+<li><strong>سالب 💯:</strong> كايحس براسو مرا – كاين اللي غير بينو وبين راسو، وكاين اللي خارج ليها كود (Direct)</li>
+<li><strong>Les deux:</strong> كيبغي موجب وسالب، هاد النوع غالباً كيكون مرجّل</li>
+<li><strong>موجب 💯</strong></li>
+<li><strong>Bi (مزدوج الميول):</strong> كاين Bi Actif، Bi Passif، Bi Les deux</li>
+<li><strong>مكبوت:</strong> ظروفو الاجتماعية والمادية خلاتو يكون Actif فدماغو بس</li>
+</ul>
+<p>حنا شنو غانديرو؟ غانحاولو نفهمو كل واحد علاش هو فديك الحالة المعينة. باش يكون صحيح (بما أن حنا غير جينات)، ما خاصش يكونو هاد الأنواع، خاص نكونو متقاربين على الأقل.</p>`,
+a:`<div class="ch-title">الفصل الثالث: أنواع المثلية والشخصية</div>
+<p>الحين، عندنا أنواع مختلفة:</p>
+<ul class="bl">
+<li><strong>السالب 💯:</strong> يحس من داخله إنه حريم—فيه اللي يخلي الموضوع بينه وبين نفسه، وفيه اللي يفصح عنه مباشرة</li>
+<li><strong>الاثنين (متعدد):</strong> يحب الدورين، وهالنوع غالباً مظهره رجولي</li>
+<li><strong>الموجب 💯</strong></li>
+<li><strong>المزدوج (Bi):</strong> Bi موجب، Bi سالب، Bi الاثنين</li>
+<li><strong>المكبوت:</strong> ظروفه الاجتماعية والمادية خلته نشط بس في مخه</li>
+</ul>
+<p>وش راح نسوي؟ راح نحاول نفهم ليش كل واحد في هالوضع المعين. عشان يكون منطقياً (بما إننا كلنا جينات)، هالأنواع ما المفروض تكون موجودة—المفروض كلنا متشابهين تقريباً.</p>`,
+f:`<div class="ch-title">Chapitre 3 : Les types d'homosexualité et la personnalité</div>
+<p>En ce moment, on a différents types :</p>
+<ul class="bl">
+<li><strong>Passif 💯 :</strong> Se sent femme à l'intérieur – certains le gardent pour eux, d'autres sont ouvertement out (Direct)</li>
+<li><strong>Les deux (Versatile) :</strong> Aime les deux rôles, ce type est généralement viril en apparence</li>
+<li><strong>Actif 💯</strong></li>
+<li><strong>Bi (bisexuel) :</strong> Bi Actif, Bi Passif, Bi Les deux</li>
+<li><strong>Refoulé :</strong> Les circonstances sociales et financières l'ont maintenu actif seulement dans sa tête</li>
+</ul>
+<p>On va faire quoi ? On va essayer de comprendre pourquoi chacun est dans cette situation spécifique. Pour que ça ait du sens (puisqu'on est tous des gènes), ces types ne devraient pas exister—on devrait tous être à peu près pareils.</p>`,
+e:`<div class="ch-title">Chapter 3: Types of Homosexuality and Personality</div>
+<p>Right now, we have different types:</p>
+<ul class="bl">
+<li><strong>Bottom 💯:</strong> Feels like a woman inside – some keep it between themselves, others are openly out (Direct)</li>
+<li><strong>Both ways (Les deux):</strong> Likes both roles, this type is usually masculine-presenting</li>
+<li><strong>Top 💯</strong></li>
+<li><strong>Bi (bisexual):</strong> Bi Top, Bi Bottom, Bi Both</li>
+<li><strong>Suppressed:</strong> Social and financial circumstances made him stay active only in his head</li>
+</ul>
+<p>What are we going to do? We'll try to understand why each one is in that specific situation. For it to make sense (since we're all just genes), these types shouldn't exist—we should all be roughly the same.</p>`
+,s:`<div class="ch-title">Capítulo 3: Los tipos de homosexualidad y la personalidad</div>
+<p>Ahora mismo, tenemos diferentes tipos:</p>
+<ul class="bl">
+<li><strong>Pasivo 💯:</strong> Se siente mujer por dentro – algunos lo guardan para sí, otros son abiertamente out (Directo)</li>
+<li><strong>Los dos (Versatile):</strong> Le gustan ambos roles, este tipo generalmente aparenta ser masculino</li>
+<li><strong>Activo 💯</strong></li>
+<li><strong>Bi (bisexual):</strong> Bi Activo, Bi Pasivo, Bi Los dos</li>
+<li><strong>Reprimido:</strong> Las circunstancias sociales y económicas lo mantuvieron activo solo en su cabeza</li>
+</ul>
+<p>¿Qué vamos a hacer? Intentaremos entender por qué cada uno está en esa situación específica. Para que tenga sentido (dado que todos somos genes), estos tipos no deberían existir—todos deberíamos ser más o menos iguales.</p>`
+,zh:`<div class="ch-title">第三章：同性恋的类型与个性</div>
+<p>目前，我们有不同的类型：</p>
+<ul class="bl">
+<li><strong>受（0）💯：</strong>内心感觉自己是女人——有些人保留在自己心里，有些人公开出柜（直接型）</li>
+<li><strong>两者皆可（百变）：</strong>喜欢两种角色，这种类型通常外表阳刚</li>
+<li><strong>攻（1）💯</strong></li>
+<li><strong>双性恋（Bi）：</strong>Bi攻、Bi受、Bi两者皆可</li>
+<li><strong>压抑型：</strong>社会和经济环境使他只能在头脑中活跃</li>
+</ul>
+<p>我们要做什么？我们将尝试理解为什么每个人都处于那种特定情况。为了有意义（因为我们都是基因），这些类型不应该存在——我们应该都差不多相同。</p>`
+}},
+
+// C3-2
+{type:'inner',ch:'c3',n:9,c:{
+d:`<p><strong>1) المبنّت علناً:</strong> هاد النوع أدّاتو ظروف الحياة للحساسية الزايدة وضعف الشخصية. تخيل بنادم يعيش فمجتمع كيقول: "المثلي = ناقص رجولة، حرام، شذوذ…" وهو فداخلو كيعرف أنه كيميل لهاد النوع ديال العلاقة.</p>
+<p>شنو كيوقع؟ كبت داخلي، تساؤلات طويلة: "علاش أنا هكا؟ علاش ماشي بحال صحابي؟" مع الوقت، كيلقى راحو فدور "المرة"، كيقلد صورة الأنثى، كيعطي الجرأة للذات اللي كانت مخبيا.</p>
+<p><strong>2) سالب ولكن مرجّل:</strong> كاين جوج احتمالات؛ إما راه ما عندوش الجرأة، أو المكانة الاجتماعية والعائلية ما كتسمحلوش. فالأخير كيولي مرا مع راسو وراجل فالمجتمع، عايش جوج شخصيات.</p>
+<p><strong>3) Les deux (Versatile):</strong> الظروف ديالو خلاتو يستنتج أنه يقدر يجمع الاتجاهين. الدور اللي كيلعبو فالعلاقة كيولي مسألة ديال الشعور فداك اللحظة، ماشي هوية ثابتة.</p>`,
+a:`<p><strong>1) المبنّت قدام الناس:</strong> ظروف الحياة هي اللي سحبت هالنوع لحساسية مفرطة و"ضعف شخصية"—بين قوسين، لأن ضعف الشخصية في الحقيقة هو اللي يخلي الواحد يوصل لهالمرحلة. تخيل واحد يكبر في مجتمع يعتبر المثلية خط أحمر كبير، شيء ممكن يدمر حياتك؛ وبنفس الوقت دينياً يغضب الله. وكل هذا يجي ويصدم في جيناتك.</p>
+<p>وش تتوقع يصير؟ كبت داخلي. ومع رحلة طويلة من التساؤلات وضغط المجتمع—وهو جالس مع أخوياه يسمع كلام قاسي عن المثليين—ينتهي به الحال في دور "الحريم"، يقلد الصورة الأنثوية، يعطي الجرأة للذات اللي كانت مخبية.</p>
+<p><strong>2) السالب بس مسوي فيها رجال:</strong> احتمالين: إما ما عنده جرأة النوع الأول، أو مكانته الاجتماعية والعائلية ما تسمح له. بالنهاية، الكبت يتراكم داخله. يصير حريم مع نفسه، ورجال قدام المجتمع. شخصيتين.</p>
+<p><strong>3) الاثنين (متعدد):</strong> ظروفه خلته يستنتج إنه يقدر يجمع الاتجاهين. الدور اللي يلعبه يصير مسألة إحساس في تلك اللحظة—مو هوية ثابتة.</p>`,
+f:`<p><strong>1) Le mec ouvertement efféminé :</strong> Les circonstances de la vie ont poussé ce type vers une sensibilité extrême et une "personnalité faible"—entre guillemets, parce qu'une personnalité faible, c'est ce qui pousse quelqu'un à atteindre ce stade. Imagine quelqu'un qui grandit dans une société où l'homosexualité est une ligne rouge énorme, ça peut détruire ta vie ; et en même temps, religieusement, ça attire la colère de Dieu. Tout ça vient s'écraser contre ta génétique.</p>
+<p>Qu'est-ce que tu t'attends à ce qui se passe ? Un refoulement interne. Après un long voyage de remises en question et de pression sociale—assis avec ses potes, à entendre des discours durs sur les gays—il finit par jouer le rôle de "la femme", imitant l'image féminine, donnant du courage au moi qui était toujours caché.</p>
+<p><strong>2) Passif mais viril :</strong> Deux possibilités : soit il manque de l'audace du premier type, soit son statut social et familial ne le lui permet absolument pas. À la fin, le refoulement s'accumule en lui. Il devient une femme avec lui-même, et un homme dans la société. Deux personnalités.</p>
+<p><strong>3) Les deux (Versatile) :</strong> Ses circonstances l'ont amené à conclure qu'il peut combiner les deux directions. Le rôle qu'il joue devient une question de ressenti dans ce moment-là—pas une identité fixe.</p>`,
+e:`<p><strong>1) The openly effeminate guy:</strong> Life circumstances dragged this type into extreme sensitivity and a "weak personality"—in quotes, because a weak personality is actually what pushes someone to reach that stage. Imagine someone growing up in a society where homosexuality is a massive red line, it can destroy your life; and at the same time, religiously, it incurs God's wrath. All of this crashes right into your genetics.</p>
+<p>What do you expect to happen? Internal repression. Over a long journey of questioning and societal pressure—sitting with his friends hearing harsh talk about gays—he eventually ends up in the "woman's" role, imitating the female image, giving courage to the self that was always hidden.</p>
+<p><strong>2) Bottom but masculine:</strong> Two possibilities: either he lacks the audacity of the first type, or his social and family status absolutely does not allow it. In the end, the repression builds up inside him. He becomes a woman with himself, and a man in society. Living two personalities.</p>
+<p><strong>3) Both ways (Versatile):</strong> His circumstances led him to conclude that he can combine both directions. The role he plays becomes a matter of how he feels in that moment—not a fixed identity.</p>`
+,s:`<p><strong>1) El chico abiertamente afeminado:</strong> Las circunstancias de la vida arrastraron a este tipo a una sensibilidad extrema y una "personalidad débil"—entre comillas, porque una personalidad débil es en realidad lo que empuja a alguien a llegar a esa etapa. Imagina a alguien creciendo en una sociedad donde la homosexualidad es una enorme línea roja, puede destruir tu vida; y al mismo tiempo, religiosamente, atrae la ira de Dios. Todo esto choca directamente contra tu genética.</p>
+<p>¿Qué esperas que pase? Represión interna. A lo largo de un largo viaje de dudas y presión social—sentado con sus amigos escuchando comentarios duros sobre los gays—con el tiempo acaba en el rol de "la mujer", imitando la imagen femenina, dando valor al yo que siempre estuvo escondido.</p>
+<p><strong>2) Pasivo pero masculino:</strong> Dos posibilidades: o le falta la audacia del primer tipo, o su estatus social y familiar no se lo permite. Al final, la represión se acumula dentro de él. Se convierte en una mujer consigo mismo y en un hombre en la sociedad. Dos personalidades.</p>
+<p><strong>3) Los dos (Versatile):</strong> Sus circunstancias lo llevaron a concluir que puede combinar ambas direcciones. El rol que juega se convierte en una cuestión de cómo se siente en ese momento—no una identidad fija.</p>`
+,zh:`<p><strong>1) 公开女性化的男生：</strong>生活环境将这种类型拖入了极度敏感和"性格软弱"的境地——加引号，因为性格软弱实际上正是把人推向那个阶段的原因。想象一下，一个人在把同性恋视为巨大红线的社会里长大，它可以毁了你的生活；同时在宗教上，它会招致上帝的愤怒。所有这些都与你的基因发生冲突。</p>
+<p>你期望会发生什么？内心压抑。在经历了漫长的质疑和社会压力之后——和朋友坐在一起，听着关于同性恋的刺耳言论——他最终扮演起"女人"的角色，模仿女性形象，给那个一直隐藏的自我勇气。</p>
+<p><strong>2) 受但很爷们：</strong>两种可能：要么他缺乏第一种类型的胆量，要么他的社会和家庭地位根本不允许他这样做。最终，压抑在他内心积累。他在自己面前成为女人，在社会中却是个男人。两种人格。</p>
+<p><strong>3) 两者皆可（百变）：</strong>他的环境让他得出结论，他可以结合两个方向。他在关系中扮演的角色变成了那个时刻的感受问题——而不是固定的身份。</p>`
+}},
+
+// C3-3
+{type:'inner',ch:'c3',n:10,c:{
+d:`<p><strong>4) الموجب (Actif):</strong> هاد خونا غالباً كيكون عندو واحد التوازن بين شخصيتو وجيناتو. من شخصيتو كيبغي يكون هو الموجب وهو المسيطر فالعلاقة، والعامل النفسي مسيطر على الجينات على حساب المعايير ديال المجتمع.</p>
+<p><strong>5) Bi (مزدوج الميول):</strong> غالباً هاد السيد من صغرو عاش مع البنات، وغالباً ما كتكون تجربتو الأولى مع بنت، ومن بعد عاد كيبقى غادي فرحلة اكتشاف الذات. وبالنسبة للأدوار، كاين Bi Actif وكاين Bi Les deux وكاين Bi Passif.</p>
+<p><strong>6) المكبوت:</strong> راه حتى هو كيمارس الجينات ديالو، غير ظروفو الاجتماعية والمادية خلاتو يكون Actif فدماغو بأصح التعبير، ولكن الإمكانيات المادية ما كتعاونش. احتمال كبير كون كان عندو فلوس يقدر يوصل يكون Bi.</p>
+<p>وكاين حتى النوع اللي كيسمى Hétéro: ظروف الحياة والمراحل لاعبين بشكل كبير فيه. كتلقى هاد النوع ظروفو المادية معاوناه، وكايكون فمرحلة مكتفي بالبنت، عمرو ذاق ديك التجربة الأخرى.</p>`,
+a:`<p><strong>4) الموجب:</strong> هالخوي غالباً عنده توازن بين شخصيته وجيناته. شخصيته تخليه يبي يكون هو المتحكم والمهيمن في العلاقة. العامل النفسي يغلب الجينات حسب معايير المجتمع.</p>
+<p><strong>5) المزدوج (Bi):</strong> غالباً هالخوي كبر وسط البنات، وتجربته الجنسية الأولى كانت مع بنت. بعدين انطلق في رحلة اكتشاف الذات. من ناحية الأدوار: Bi موجب، Bi الاثنين، Bi سالب. الفرق إن المزدوج مر بمراحل جنسية مختلفة، وغالباً التجربة الأولى كانت مع بنت.</p>
+<p><strong>6) المكبوت:</strong> هو بعد يمارس جيناته، بس ظروفه الاجتماعية والمادية خلته نشط بس في مخه—الإمكانيات ما تساعد. فيه احتمال كبير إنه لو كان عنده فلوس وحرية، يصير مزدوج.</p>
+<p>وفيه بعد نوع يسمونه "ستريت": ظروف الحياة والمراحل لها دور كبير هنا. وضعه المادي يساعده؛ هو في مرحلة البنت تكفيه، ما جرب الخيار الثاني.</p>`,
+f:`<p><strong>4) Actif :</strong> Ce gars a généralement un équilibre entre sa personnalité et sa génétique. Sa personnalité lui fait vouloir être celui qui contrôle, le dominant dans la relation. Le facteur psychologique prend le dessus sur la génétique selon les standards de la société.</p>
+<p><strong>5) Bi (bisexuel) :</strong> En général, ce gars a grandi entouré de filles, et sa première expérience sexuelle était avec une fille. Ensuite, il est parti dans un voyage de découverte de soi. Pour les rôles : Bi Actif, Bi Les deux, Bi Passif. La différence, c'est que le Bi a traversé différentes étapes sexuelles, et généralement la première expérience était avec une fille.</p>
+<p><strong>6) Le refoulé :</strong> Lui aussi pratique sa génétique, mais ses circonstances sociales et financières l'ont maintenu actif seulement dans sa tête—les ressources ne coopèrent pas. Il y a une forte probabilité que s'il avait l'argent et la liberté, il finirait en Bi.</p>
+<p>Et il y a aussi le type soi-disant "hétéro" : les circonstances de la vie et les étapes jouent un rôle énorme ici. Sa situation financière le soutient ; il est dans une étape où la fille lui suffit, il n'a jamais vraiment essayé l'autre expérience.</p>`,
+e:`<p><strong>4) Top (Actif):</strong> This guy usually has a balance between his personality and his genetics. His personality makes him want to be the one in control, the dominant one in the relationship. The psychological factor overrides the genetics based on society's standards.</p>
+<p><strong>5) Bi (bisexual):</strong> Usually this guy grew up around girls, and his first sexual experience was with a girl. Then he went on a journey of self-discovery. As for roles: Bi Top, Bi Both, Bi Bottom. The difference is that Bi was taken through different sexual stages, and usually the first experience was with a girl.</p>
+<p><strong>6) The suppressed one:</strong> He also practices his genetics, but his social and financial circumstances kept him active only in his head—the resources just don't cooperate. There's a high probability that if he had money and freedom, he'd end up as Bi.</p>
+<p>And there's also the so-called "hetero" type: life circumstances and stages play a huge role here. His financial situation supports him; he's in a stage where the girl is enough for him, he's never really tried the other experience.</p>`
+,s:`<p><strong>4) Activo:</strong> Este tío generalmente tiene un equilibrio entre su personalidad y su genética. Su personalidad le hace querer ser el que controla, el dominante en la relación. El factor psicológico se impone a la genética según los estándares de la sociedad.</p>
+<p><strong>5) Bi (bisexual):</strong> Generalmente este tío creció rodeado de chicas, y su primera experiencia sexual fue con una chica. Luego se embarcó en un viaje de autodescubrimiento. En cuanto a los roles: Bi Activo, Bi Los dos, Bi Pasivo. La diferencia es que el Bi pasó por diferentes etapas sexuales, y generalmente la primera experiencia fue con una chica.</p>
+<p><strong>6) El reprimido:</strong> Él también practica su genética, pero sus circunstancias sociales y económicas lo mantuvieron activo solo en su cabeza—los recursos no cooperan. Hay una alta probabilidad de que si tuviera dinero y libertad, acabara siendo Bi.</p>
+<p>Y también está el tipo llamado "hetero": las circunstancias de la vida y las etapas juegan un papel enorme aquí. Su situación económica lo apoya; está en una etapa en la que la chica le basta, nunca ha probado realmente la otra experiencia.</p>`
+,zh:`<p><strong>4) 攻（主动型）：</strong>这个家伙通常在他的个性和基因之间有一种平衡。他的个性使他想成为关系中的控制者和主导者。根据社会标准，心理因素凌驾于基因之上。</p>
+<p><strong>5) 双性恋（Bi）：</strong>通常这个家伙从小就与女生一起长大，他的第一次性经历是与女生。然后他踏上了自我发现之旅。关于角色：Bi攻、Bi两者皆可、Bi受。区别在于Bi经历了不同的性阶段，通常第一次经历是与女生。</p>
+<p><strong>6) 压抑型：</strong>他也在实践自己的基因，但他的社会和经济环境使他只能在头脑中活跃——资源不配合。很有可能，如果他有钱有自由，他最终会成为双性恋。</p>
+<p>还有所谓的"异性恋"类型：生活环境和阶段在这里起着巨大作用。他的经济情况支持他；他处于女生就够他用的阶段，从未真正尝试过另一种体验。</p>`
+}},
+
+// C4-1
+{type:'inner',ch:'c4',n:11,c:{
+d:`<div class="ch-title">الفصل الرابع: نربطو النقط ونعريو الحقيقة</div>
+<p>دابا حنا غانحاولو نفهمو من الفوق. تخيل راسك الفوق، والأنواع كتشوف فيهم بذاك الوصف. كتلقى أن داك الـ Passif المشوه، إلى بدلنا ليه مشوار الحياة وحطيناه فمشوار ديال Actif أو Hétéro مثلاً، غادي تبدّل ليهم حتى الميولات الجنسية.</p>
+<p>دونك هنا كايبان لينا أنه عندنا الحق نتحكمو فيهم. ونلاقيو نقطة وحدة إلى بغينا نوحدوهم.</p>
+<p>عندنا عرفنا أن هادشي اللي فيك راه جينات. وعرفنا منين جاو الأحكام الاجتماعية والدينية. إلى ربطنا هاد الجوج غانلقاو: كون ما كانش هادشي اللي دارو المجتمع والأديان، كون عايشين الطبيعة ديالنا، مرتاحين وعايشين الحياة En rose!</p>
+<div class="hl">الدور ديالنا الآن: نرجعو الورد لبلاصتو، ونعيشوه كاملين.</div>`,
+a:`<div class="ch-title">الفصل الرابع: ربط النقاط وكشف الحقيقة</div>
+<p>الحين خلنا نحاول نفهم من نظرة أشمل. تخيل نفسك تطالع من فوق على كل هالأنواع. ناخذ ذاك النوع "السالب المشوه" كمثال—لو غيرنا مسار حياته وحطيناه في مسار شخص موجب أو ستريت، ميوله الجنسية راح تتغير بالكامل.</p>
+<p>إذن يتبين إن عندنا القدرة نشكل هالشيء. نقدر نسحب واحد لهنا، وندف الثاني لهناك. لو بغينا نردهم كلهم لنقطة وحدة، والله نقدر.</p>
+<p>عرفنا إن اللي فيك هذا جيني. وعرفنا من وين جت الأحكام الاجتماعية والدينية. لو ربطنا هالشغلتين، نلقى: لولا اللي سواه المجتمع والأديان، كان أنا أصلاً ما كتبت لك هالكتاب. كان كلنا عايشين على طبيعتنا، مرتاحين، حياة وردية 🌹</p>
+<div class="hl">دورنا الحين: نرجع هالورد لمكانه، عشان نعيشه كلنا.</div>`,
+f:`<div class="ch-title">Chapitre 4 : Relier les points et révéler la vérité</div>
+<p>Maintenant, essayons de comprendre avec une vue d'ensemble. Imagine-toi en train de regarder d'en haut tous ces types. Prenons ce type "passif déformé"—si on changeait son parcours de vie et qu'on le mettait sur le parcours de quelqu'un d'actif ou d'hétéro, son orientation sexuelle changerait complètement.</p>
+<p>Donc ça devient clair : on a le pouvoir de façonner ça. On peut tirer l'un par ici, pousser l'autre par là. Si on voulait tous les ramener à un seul point, on pourrait absolument le faire.</p>
+<p>On sait que ce qui est en toi est génétique. On sait d'où viennent les jugements sociaux et religieux. Si on relie ces deux choses, on trouve : s'il n'y avait pas eu ce que la société et les religions ont fait, je ne serais même pas en train de t'écrire ce livre. On vivrait tous selon notre vraie nature, à l'aise, la vie en rose 🌹</p>
+<div class="hl">Notre rôle maintenant : remettre ces roses à leur place, pour qu'on puisse tous la vivre.</div>`,
+e:`<div class="ch-title">Chapter 4: Connecting the Dots and Revealing the Truth</div>
+<p>Now let's try to understand from a higher view. Imagine yourself looking from above at all those types. Take the "deformed bottom" type—if we changed his life path and put him on the path of someone who's a top or hetero, his sexual orientation would change entirely.</p>
+<p>So it becomes clear: we actually have the power to shape this. We can pull one this way, push another that way. If we wanted to bring them all back to one single point, we absolutely could.</p>
+<p>We know that what's inside you is genetic. We know where the social and religious judgments came from. If we connect these two things, we find: if it weren't for what society and religions did, I wouldn't even be writing this book. We would all be living our true nature, comfortable, living life like a bed of roses 🌹</p>
+<div class="hl">Our role now: bring those roses back to where they belong, so we can all live it.</div>`
+,s:`<div class="ch-title">Capítulo 4: Conectar los puntos y revelar la verdad</div>
+<p>Ahora intentemos entender desde una perspectiva más amplia. Imagínate mirando desde arriba a todos esos tipos. Tomemos ese tipo "pasivo deformado"—si cambiáramos su camino de vida y lo pusiéramos en el camino de alguien activo o hetero, su orientación sexual cambiaría por completo.</p>
+<p>Así queda claro: en realidad tenemos el poder de moldear esto. Podemos tirar a uno por aquí, empujar al otro por allá. Si quisiéramos reducirlos todos a un solo punto, absolutamente podríamos.</p>
+<p>Sabemos que lo que llevas dentro es genético. Sabemos de dónde vienen los juicios sociales y religiosos. Si conectamos estas dos cosas, encontramos: si no fuera por lo que hicieron la sociedad y las religiones, ni siquiera estaría escribiendo este libro. Todos estaríamos viviendo nuestra verdadera naturaleza, a gusto, la vida en color de rosa 🌹</p>
+<div class="hl">Nuestro papel ahora: devolver esas rosas a su lugar, para que todos podamos vivirla.</div>`
+,zh:`<div class="ch-title">第四章：连接各点揭示真相</div>
+<p>现在让我们尝试从更宏观的视角来理解。想象一下从上面俯视所有这些类型。拿那个"扭曲的受"类型来说——如果我们改变他的人生轨迹，把他放在一个主动型或异性恋者的人生轨迹上，他的性取向会完全改变。</p>
+<p>因此很明显：我们实际上有能力塑造这一点。我们可以把一个拉到这边，把另一个推到那边。如果我们想把他们都拉回一个点，我们绝对可以做到。</p>
+<p>我们知道你内心拥有的是基因。我们知道社会和宗教判断从哪里来。如果我们把这两件事联系起来，我们会发现：如果不是因为社会和宗教所做的一切，我甚至不会为你写这本书。我们都会顺应自己的真实本性生活，非常自在，过着玫瑰般的生活🌹</p>
+<div class="hl">我们现在的角色：把这些玫瑰带回它们属于的地方，让我们所有人都能享受。</div>`
+}},
+
+// C4-2
+{type:'inner',ch:'c4',n:12,c:{
+d:`<p>كيف گلنا، كاتكبر بأفكار من الصغر: "لا لا لا، المثلية خط أحمر فالمجتمع"، وانت كتحس بطبيعتك. فاش كتشوف المجتمع والدين يرفض داكشي نهائياً، دماغك كيقول: "أنا ماشي ديال الدراري."</p>
+<p>فاش كاتنعس مع البنت فالفراش، كاينوض داك الضغط ديال المجتمع والدين رافض داكشي وأنا كنرتاح فيه. الدماغ كايرسل إشارات ديال القضيب والدوبامين اللي خاص يكونو حاضرين فعلاقة جنسية، لا كايوظفهومش. وهنا كاتلقى مالقيتيش لا متعة، ولا قضيب ديالك بغى يبقى منتصب.</p>
+<p>إلى انت فهمتي هادشي كامل، إلى فهمتي أنك راه طبيعي تمارس مع دري وبنت، غادي تكون à l'aise، والدوبامين خدامين مزيان. هكا غاتصالح مع راسك.</p>
+<div class="hl">وملي حلّينا هاد القوس: هاد الرسالة ليك أختي: إلى كان راجلك كيبغي يمارس مع دري، خاصك تكوني كتحترمي الطبيعة ديالو.</div>`,
+a:`<p>زي ما قلنا، أنت تكبر من طفولتك على فكرة "لا لا لا، المثلية خط أحمر كبير في المجتمع"، وبنفس الوقت تحس بطبيعتك الداخلية. لما تشوف إن المجتمع والدين يرفضون هالشيء نهائياً، مخك يقول لنفسه: "أنا ماني راعي عيال."</p>
+<p>لما تنام مع بنت في الفراش، ضغط المجتمع والدين—اللي يرفض الشيء اللي أنت ترتاح له—يشتغل. مخك يرسل إشارات لعضوك الذكري وللدوبامين اللي المفروض يكونون حاضرين في العلاقة الجنسية، بس يوظفهم غلط. هنا تلقى نفسك ما تحس بأي متعة، ولا عضوك راضي يظل منتصب. وبعض الناس ما يوقف معهم أبد. وأنت مو مستوعب إنك قاعد تحارب طبيعتك الحقيقية، ههههه!</p>
+<p>لو فهمت كل هذا—لو فهمت إن من الطبيعي إنك تكون مع عيال وبنات—راح تكون مرتاح بالكامل، والدوبامين راح يشتغل زين. هكذا تتصالح مع نفسك.</p>
+<div class="hl">ورسالتي لك يا أختي: لو راجلك يبي يكون مع عيال، لازم تحترمي طبيعته.</div>`,
+f:`<p>Comme on a dit, tu grandis depuis l'enfance avec l'idée : "Non non non, l'homosexualité est une énorme ligne rouge dans la société", alors qu'en même temps, tu ressens ta vraie nature. Quand tu vois que la société et la religion rejettent complètement ça, ton cerveau se dit : "Je suis pas fait pour les mecs."</p>
+<p>Quand tu couches avec une fille au lit, la pression de la société et de la religion—qui rejette ce avec quoi tu es à l'aise—s'active. Ton cerveau envoie des signaux à ton pénis et la dopamine qui devrait être là dans une relation sexuelle, il les place mal. C'est là que tu te rends compte que tu ne prends aucun plaisir, et que ton pénis ne veut pas rester en érection. Pour certains, il ne se lève même pas du tout. Et tu ne te rends même pas compte que tu combats ta propre vraie nature, mdr !</p>
+<p>Si tu comprends tout ça—si tu comprends qu'il est naturel pour toi d'être avec un mec et une meuf—tu seras totalement à l'aise, et la dopamine marchera parfaitement. C'est comme ça que tu te réconcilies avec toi-même.</p>
+<div class="hl">Et une fois cette parenthèse fermée : ce message est pour toi, ma sœur—si ton homme veut être avec un mec, tu dois respecter sa nature.</div>`,
+e:`<p>As we said, you grow up from childhood with the idea: "No no no, homosexuality is a massive red line in society," while at the same time, you feel your true nature. When you see that society and religion completely reject this, your brain tells itself: "I'm not into guys."</p>
+<p>When you sleep with a girl in bed, the pressure from society and religion—which rejects what you actually find comfortable—kicks in. Your brain sends signals to your penis and the dopamine that should be present in a sexual relationship, but it misplaces them. That's when you find you get no pleasure, nor does your penis want to stay erect. For some, it doesn't even get up at all. And you don't even realize you're fighting your own true nature, lol!</p>
+<p>If you understand all of this—if you understand that it's natural for you to be with both a guy and a girl—you'll be totally at ease, and the dopamine will work perfectly. That's how you make peace with yourself.</p>
+<div class="hl">And once we close this parenthesis: this message is for you, sister—if your man wants to be with a guy, you need to respect his nature.</div>`
+,s:`<p>Como dijimos, creces desde la infancia con la idea: "No no no, la homosexualidad es una enorme línea roja en la sociedad", mientras que al mismo tiempo sientes tu verdadera naturaleza. Cuando ves que la sociedad y la religión rechazan esto por completo, tu cerebro se dice: "No soy de los chicos."</p>
+<p>Cuando te acuestas con una chica en la cama, la presión de la sociedad y la religión—que rechaza aquello con lo que realmente te sientes cómodo—se activa. Tu cerebro envía señales a tu pene y la dopamina que debería estar en una relación sexual, la coloca mal. Ahí es cuando te das cuenta de que no sientes ningún placer, ni tu pene quiere mantenerse erecto. A algunas personas ni siquiera se les levanta. ¡Y ni siquiera te das cuenta de que estás luchando contra tu propia verdadera naturaleza, jajaja!</p>
+<p>Si entiendes todo esto—si entiendes que es natural para ti estar con un chico y una chica—estarás totalmente a gusto, y la dopamina funcionará perfectamente. Así es como haces las paces contigo mismo.</p>
+<div class="hl">Y una vez cerrado este paréntesis: este mensaje es para ti, hermana—si tu hombre quiere estar con un chico, debes respetar su naturaleza.</div>`
+,zh:`<p>正如我们所说，你从小就带着同性恋是社会中不可逾越的红线的观念长大，同时，你又感受到了自己的真实本性。当你看到社会和宗教完全拒绝这一点时，你的大脑对自己说："我不喜欢男生。"</p>
+<p>当你在床上和一个女生睡觉时，社会和宗教的压力——它拒绝让你真正感到自在的东西——被激活了。你的大脑向你的阴茎发送信号，把本应在性关系中出现的多巴胺放错了地方。那时你会发现你得不到任何快乐，你的阴茎也不想一直保持勃起。对一些人来说，它甚至根本起不来。你甚至都没有意识到你正在对抗自己的真实本性，哈哈哈！</p>
+<p>如果你理解了这一切——如果你理解与男生和女生在一起对你来说是自然的——你将会完全自在，多巴胺会完美运作。这就是你与自己和解的方式。</p>
+<div class="hl">关闭这个括号后的信息是给你的，姐妹——如果你的男人想和一个男生在一起，你需要尊重他的本性。</div>`
+}},
+
+// KH - خاتمة
+{type:'inner',ch:'kh',n:13,c:{
+d:`<div class="ch-title">الخاتمة: حقيقة الشذوذ والتصالح مع الذات</div>
+<p>فاش كتشوف هادشي كامل بنظرة وحدة وفكرة وحدة، كتولي تستنتج أن "الشذوذ الجنسي" اللي دوينا عليه هادشي كامل، أصلاً ماشي هو الشذوذ الجنسي!</p>
+<p>غاتقولي: "هو دري مع دري." وغانقوليك: علاش قلتي هاد الجواب وانت ما فاهم والو ومازال ما قريتي الكتاب كاع؟ جيناتك غاتقوليك: "راه حرام، راه ممنوع اجتماعياً."</p>
+<div class="hl">الشذوذ الجنسي الحقيقي: هو أنك ما ديرش ديك الحاجة اللي كتحسها من الداخل، أو تبدا تقول حتى انت راه داكشي شذوذ. هاد الفكرة بحد ذاتها: شذوذ فكري.</div>
+<p>فالنصيحة ديالي الأولى: عنقو بعضياتكم. وإلى كنتي أختي وراجلك كيبغي يمارس مع دري، خاصك تحترمي الطبيعة ديالو. وإلى قريتي الكتاب كامل، غاتكوني مقتنعة وغاتجيك عادية.</p>`,
+a:`<div class="ch-title">الخاتمة: الشذوذ الحقيقي والتصالح مع النفس</div>
+<p>لما تشوف كل هذا من نظرة وحدة، تبدأ تستنتج إن "الشذوذ الجنسي"—اللي قاعدين نتكلم عنه طول الوقت—في الحقيقة مو الشذوذ الحقيقي!</p>
+<p>راح تقول: "هو عيال مع عيال." وأنا راح أسألك: ليش جبت هالجواب وأنت لسه ما فهمت شيء وما خلصت الكتاب؟ جيناتك راح تقول لك: "هذا حرام، هذا ممنوع اجتماعياً."</p>
+<div class="hl">الشذوذ الجنسي الحقيقي هو: إنك ما تسوي الشيء اللي تحسه من داخلك، أو تبدأ تقول لنفسك إن هذا شذوذ. هالفكرة نفسها: هي شذوذ فكري.</div>
+<p>نصيحتي الأولى: احضنوا بعض. ولو كنتِ امرأة وراجلك يبي يكون مع عيال، لازم تحترمي طبيعته. ولو خلصت الكتاب كاملاً، راح تكون مقتنع وتجيك طبيعية.</p>`,
+f:`<div class="ch-title">Conclusion : La vraie déviance et se réconcilier avec soi-même</div>
+<p>Quand tu vois tout ça d'une seule perspective, tu commences à conclure que la "déviance sexuelle"—le truc dont on a parlé tout ce temps—n'est en fait PAS la vraie déviance !</p>
+<p>Tu vas dire : "C'est un mec avec un mec." Et je vais te demander : pourquoi t'as donné cette réponse alors que t'as rien compris et que t'as pas encore fini le livre ? Ta génétique va te dire : "C'est haram, c'est socialement interdit."</p>
+<div class="hl">La VRAIE déviance sexuelle, c'est : ne pas faire cette chose que tu ressens à l'intérieur, ou commencer à te dire que c'est une déviance. Cette idée elle-même : c'est une déviance intellectuelle.</div>
+<p>Mon premier conseil : serrez-vous dans les bras. Et si t'es une femme dont le mec veut être avec un gars, tu dois respecter sa nature. Et si t'as lu tout le livre, tu seras convaincu et ça te semblera complètement naturel.</p>`,
+e:`<div class="ch-title">Conclusion: The Real Deviance and Making Peace with Yourself</div>
+<p>When you see all of this from a single perspective, you start to conclude that "sexual deviance"—the thing we've been talking about this whole time—is actually NOT the real deviance!</p>
+<p>You'll say: "It's a guy with a guy." And I'll ask you: why did you give that answer when you haven't even understood anything yet and haven't finished the book? Your genetics will tell you: "It's haram, it's socially forbidden."</p>
+<div class="hl">The REAL sexual deviance is: not doing that thing you feel inside, or starting to tell yourself that it's deviance. That idea itself: is intellectual deviance.</div>
+<p>My first piece of advice: hug each other. And if you're a woman whose man wants to be with a guy, you need to respect his nature. And if you've read the whole book, you'll be convinced and it'll feel completely natural to you.</p>`
+,s:`<div class="ch-title">Conclusión: La verdadera desviación y hacer las paces con uno mismo</div>
+<p>Cuando ves todo esto desde una sola perspectiva, empiezas a concluir que la "desviación sexual"—el tema del que hemos estado hablando todo este tiempo—¡en realidad NO es la verdadera desviación!</p>
+<p>Dirás: "Es un chico con un chico." Y yo te preguntaré: ¿por qué diste esa respuesta cuando no has entendido nada todavía y no has terminado el libro? Tu genética te dirá: "Es haram, está socialmente prohibido."</p>
+<div class="hl">La VERDADERA desviación sexual es: no hacer esa cosa que sientes por dentro, o empezar a decirte a ti mismo que es una desviación. Esa idea en sí misma: es una desviación intelectual.</div>
+<p>Mi primer consejo: abrazaos los unos a los otros. Y si eres una mujer cuyo hombre quiere estar con un chico, debes respetar su naturaleza. Y si has leído todo el libro, estarás convencido y te parecerá completamente natural.</p>`
+,zh:`<div class="ch-title">结语：真正的偏差与和自己和解</div>
+<p>当你从单一视角看待这一切时，你开始得出结论，"性偏差"——我们一直在谈论的这件事——实际上并不是真正的偏差！</p>
+<p>你会说："是男生和男生。"我会问你：你为什么给出这个答案，而你还什么都不懂，还没读完这本书？你的基因会告诉你："这是哈拉姆（禁忌），这在社会上是被禁止的。"</p>
+<div class="hl">真正的性偏差是：不做你内心感受到的那件事，或者开始告诉自己这是一种偏差。这个想法本身就是一种智识上的偏差。</div>
+<p>我的第一个建议：互相拥抱。如果你是一个男人想要和男生在一起的女人，你需要尊重他的本性。如果你读完了整本书，你会被说服，这对你来说会感觉完全自然。</p>`
+}},
+
+// KH2
+{type:'inner',ch:'kh',n:14,c:{
+d:`<p>إيوا أسيادنا، شافكم الأسد! كان معاكم واحد الدماغ لابس كركاس، سميتو RVR.</p>
+<p>أنا غير دماغ كينقل الأفكار عن طريق هاد الوجه اللي كايكتب ليكم. أنا و Abdo Moka ولّينا عشران تال الموووت.</p>
+<p>إلى ساليتي هاد الكتاب، كاين كتاب قبلو اللي ذكرناه، ابحثو عليه فالأنترنت غاتلقاوه إن شاء الله.</p>
+<div class="hl">يالاه أخوتي تصبحو على خير. عنقو بعضياتكم بلا ذنب، وبلا ما تكونو عبيد للأحكام اللي تقالت قبل ما تولدو. تهلاو فراسكم والورد يرجع لبلاصتو! 💋</div>
+<p style="text-align:center;margin-top:16px;color:var(--text2);font-size:0.85rem;">RVR & Abdo Moka – 2025</p>`,
+a:`<p>يالله يا جماعة، الأسد شافكم! كان معكم مخ جالس في هيكل، اسمه RVR. أنا مجرد مخ ينقل أفكاراً عن طريق هالوجه اللي يكتب لكم. أنا وAbdo Moka—صرنا رفاق للأبد، ههههه 🤓🤪</p>
+<p>لو خلصت هالكتاب، فيه كتاب ثاني ذكرته—دوّر عليه بالنت وبتلقاه إن شاء الله.</p>
+<div class="hl">يالله يا إخواني، تصبحون على خير. احضنوا بعض بلا ذنب، ولا تكونون عبيد لأحكام قيلت قبل ما توجدون. خلوا بالكم من نفسكم، والورد يرجع لمكانه! 💋</div>
+<p style="text-align:center;margin-top:16px;color:var(--text2);font-size:0.85rem;">RVR & Abdo Moka – 2025</p>`,
+f:`<p>Bien, tout le monde, le lion vous a vus ! Vous avez été avec un cerveau dans une carcasse, nommé RVR. Je suis juste un cerveau qui transfère des idées à travers ce visage qui vous écrit. Moi et Abdo Moka—on est inséparables pour toujours, mdr 🤓🤪</p>
+<p>Si t'as fini ce bouquin, il y a un autre livre que j'ai mentionné—cherche-le en ligne et tu le trouveras, inch'Allah.</p>
+<div class="hl">Bonne nuit tout le monde. Serrez-vous dans les bras sans culpabilité, et ne soyez pas esclaves des jugements qui ont été prononcés avant votre naissance. Prenez soin de vous, et que les roses retrouvent leur place ! 💋</div>
+<p style="text-align:center;margin-top:16px;color:var(--text2);font-size:0.85rem;">RVR & Abdo Moka – 2025</p>`,
+e:`<p>Alright everyone, the lion has seen you! You've been with a brain wearing a shell, named RVR. I'm just a brain transferring ideas through this face that writes to you. Me and Abdo Moka—we've been inseparable forever, lol 🤓🤪</p>
+<p>If you've finished this book, there's another book I mentioned—search for it online and you'll find it, God willing.</p>
+<div class="hl">Goodnight everyone. Hug each other without guilt, and don't be slaves to judgments that were made before you were born. Take care of yourselves, and let the roses return to where they belong! 💋</div>
+<p style="text-align:center;margin-top:16px;color:var(--text2);font-size:0.85rem;">RVR & Abdo Moka – 2025</p>`
+,s:`<p>¡Bueno, a todos, el león os ha visto! Habéis estado con un cerebro en una carcasa, llamado RVR. Solo soy un cerebro que transfiere ideas a través de esta cara que os escribe. Yo y Abdo Moka—somos inseparables para siempre, jajaja 🤓🤪</p>
+<p>Si has terminado este libro, hay otro libro que mencioné—búscalo en internet y lo encontrarás, inshallah.</p>
+<div class="hl">Buenas noches a todos. Abrazaos sin culpa, y no seáis esclavos de los juicios que se hicieron antes de que nacierais. Cuidaos, ¡y que las rosas vuelvan a su lugar! 💋</div>
+<p style="text-align:center;margin-top:16px;color:var(--text2);font-size:0.85rem;">RVR & Abdo Moka – 2025</p>`
+,zh:`<p>好了，大家，狮子看到你们了！你们一直跟着一个装在躯壳里的大脑，名叫RVR。我只是一个通过这张脸写作的、传递想法的大脑。我和Abdo Moka——我们永远形影不离，哈哈哈🤓🤪</p>
+<p>如果你读完了这本书，还有另一本书我提到过——在网上搜索一下，你会找到的，如果真主意愿。</p>
+<div class="hl">大家晚安。互相拥抱，不要有罪恶感，不要成为出生之前就做出的判断的奴隶。保重，让玫瑰回到它们应该在的地方！💋</div>
+<p style="text-align:center;margin-top:16px;color:var(--text2);font-size:0.85rem;">RVR & Abdo Moka – 2025</p>`
+}},
+
+{type:'back-cover'}
+];
+
+function isRTL(){return lang==='d'||lang==='a';}
+
+function renderPage(idx){
+  const p=pages[idx];
+  const area=document.getElementById('pagesArea');
+  area.querySelectorAll('.page,.paywall-page').forEach(el=>el.classList.remove('active'));
+  let el=area.querySelector(`[data-page="${idx}"]`);
+  if(!el){el=document.createElement('div');el.dataset.page=idx;area.appendChild(el);}
+
+  if(p.type==='cover'){
+    el.className='page cover active';
+    const tv=T.cover[lang]||T.cover['e'];
+    el.innerHTML=`
+      <div class="cover-corner tl"></div><div class="cover-corner tr"></div>
+      <div class="cover-corner bl"></div><div class="cover-corner br"></div>
+      <div class="cover-bg">طبيعة</div>
+      <div class="cover-wrap">
+        <div class="cover-tag">${tv[3]}</div>
+        <div class="cover-title">${tv[0]} <span>${tv[1]}</span></div>
+        <div class="cover-sub">${tv[2]}</div>
+        <div class="cover-line"></div>
+        <div class="cover-author">بقلم <span>RVR & Abdo Moka</span></div>
+        <div class="cover-edition">النسخة الكاملة • 2025</div>
+      </div>`;
+  } else if(p.type==='back-cover'){
+    el.className='page back-cover active';
+    const q={d:'الطبيعة… أ ربيعة،\nماشي دايماً كما كيصوروها ليك،\nولكن دائماً فيها منطق،\nإلا عطيت لدماغك الفرصة يفهمو.',
+      a:'الطبيعة… يا ربيعة،\nليست دائماً كما يصوّرونها لك،\nلكن فيها دائماً منطق.',
+      f:'La nature… ô Rabia,\nn\'est pas toujours comme on te la décrit,\nmais elle a toujours une logique.',
+      e:'Nature… O Rabia,\nnot always as they paint it for you,\nbut always with logic within.'};
+    el.innerHTML=`<div class="back-wrap">
+      <div style="color:rgba(64,145,108,0.25);font-size:2rem;margin-bottom:16px;">❝</div>
+      <div class="back-quote">${q[lang].replace(/\n/g,'<br>')}</div>
+      <div style="color:rgba(245,230,200,0.3);font-size:0.85rem;">RVR & Abdo Moka</div>
+    </div>`;
+  } else if(p.type==='paywall'){
+    el.className='paywall-page active'; showPwModal();
+    const waMsg=encodeURIComponent('مرحبا، بغيت نشري الكتاب الكامل 📚');
+    const msgs={
+      d:{title:'هنا توقفنا… 🔒',sub:'الكتاب الكامل فيه بزاف أكثر:\nالأنواع، الجانب النفسي، الحقيقة الكاملة.',lbl:'خلص عبر RIB ديال Attijariwafa',price:'9$ (تقريباً 90 DH)',note:'خلص وبعث screenshot على WhatsApp، نبعث ليك كود الدخول',wa:'تواصل على WhatsApp'},
+      a:{title:'توقفنا هنا… 🔒',sub:'الكتاب الكامل يحتوي الكثير أكثر.',lbl:'ادفع عبر RIB',price:'9$ (حوالي 90 DH)',note:'ادفع وأرسل لقطة شاشة على WhatsApp، سنرسل لك كود الدخول',wa:'تواصل على WhatsApp'},
+      f:{title:'On s\'arrête ici… 🔒',sub:'Le livre complet contient beaucoup plus.',lbl:'Payer via RIB Attijariwafa',price:'9$ (environ 90 DH)',note:'Payez et envoyez une capture d\'écran sur WhatsApp, nous vous enverrons le code',wa:'Contacter sur WhatsApp'},
+      e:{title:'We stop here… 🔒',sub:'The full book contains much more.',lbl:'Pay via RIB Attijariwafa',price:'9$ (approx 90 DH)',note:'Pay and send a screenshot on WhatsApp, we\'ll send you the access code',wa:'Contact on WhatsApp'}
+    };
+    const m=msgs[lang];
+    el.innerHTML=`
+      <div class="pw-icon">📚</div>
+      <div class="pw-title">${m.title}</div>
+      <div class="pw-sub">${m.sub.replace(/\n/g,'<br>')}</div>
+      <div class="pay-box">
+        <div class="pay-label">${m.lbl}</div>
+        <div class="rip-num">${RIP}</div>
+        <div class="pay-price">${m.price}</div>
+        <div class="pay-note">${m.note}</div>
+      </div>
+      <div class="divider">— أو —</div>
+      <a href="https://wa.me/${WA}?text=${waMsg}" target="_blank" class="wa-btn">💬 ${m.wa}</a>`;
+  } else {
+    el.className='page active';
+    el.innerHTML=`
+      <div class="page-header">
+        <span class="chapter-label">${T.ch[p.ch][lang]}</span>
+        <span class="page-num">${p.n}</span>
+      </div>
+      <div class="page-body">
+        <div class="page-text">${p.c[lang]}</div>
+      </div>`;
+  }
+  const onPaywall = pages[idx] && pages[idx].type==='paywall';
+  document.getElementById('prevBtn').disabled = idx===0;
+  document.getElementById('nextBtn').disabled = idx===pages.length-1 || onPaywall;
+  document.getElementById('pageInd').textContent=`${idx+1} / ${pages.length}`;
+}
+
+function changePage(d){
+  const next=pg+d;
+  if(next<0||next>=pages.length)return;
+  // If on paywall and going back, allow it
+  if(pages[pg] && pages[pg].type==='paywall' && d===-1){
+    pg=next;renderPage(pg);return;
+  }
+  // Block going forward past paywall if not unlocked
+  if(!unlocked&&next>=FREE+1&&pages[next].type!=='paywall'){
+    pg=FREE+1;renderPage(pg);return;
+  }
+  pg=next;renderPage(pg);
+}
+
+function nav(dir){
+  changePage(dir==='next'?1:-1);
+}
+
+function setLang(l,btn){
+  lang=l;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.documentElement.dir=isRTL()?'rtl':'ltr';
+  document.getElementById('prevBtn').innerHTML=isRTL()?'&#8594;':'&#8592;';
+  document.getElementById('nextBtn').innerHTML=isRTL()?'&#8592;':'&#8594;';
+  renderPage(pg);
+}
+
+function checkCode(){
+  const v=document.getElementById('codeInput').value.trim().toUpperCase();
+  if(isValidCode(v)){
+    unlocked=true;
+    localStorage.setItem('rvr_access','1');
+    // Close paywall modal and go to next page
+    document.getElementById('pwModal').style.display='none';
+    pg = FREE+2; // jump past paywall to first paid page
+    renderPage(pg);
+  } else {
+    document.getElementById('codeError').textContent='❌ الكود غلط';
+    document.getElementById('codeInput').style.borderColor='#c0392b';
+  }
+}
+document.getElementById('codeInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter')checkCode();
+  document.getElementById('codeError').textContent='';
+  document.getElementById('codeInput').style.borderColor='';
+});
+
+// Auto-open book directly, no code needed to start
+(function(){
+  document.getElementById('accessModal').style.display='none';
+  document.getElementById('langBar').style.display='flex';
+  document.getElementById('bookWrap').style.display='flex';
+  document.getElementById('controls').style.display='flex';
+  document.getElementById('waFloat').style.display='block';
+  if(localStorage.getItem('rvr_access')==='1'){unlocked=true;}
+  renderPage(0);
+})();
+
+let startX=0;
+document.getElementById('bookStage').addEventListener('touchstart',e=>{startX=e.touches[0].clientX;});
+document.getElementById('bookStage').addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].clientX-startX;
+  if(Math.abs(dx)>40){
+    if(isRTL())changePage(dx<0?1:-1);
+    else changePage(dx>0?-1:1);
+  }
+});
+</script>
+
+<!-- PAYWALL MODAL -->
+<div id="pwModal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(8,28,21,0.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;">
+  <div style="background:#f6faf7;border:1px solid rgba(45,106,79,0.2);border-radius:16px;padding:36px 28px;max-width:380px;width:90%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.2);">
+    <div style="font-size:44px;margin-bottom:12px">📚</div>
+    <div style="font-family:'Amiri',serif;color:#1a1008;font-size:1.3rem;margin-bottom:8px" id="pwTitle">هنا توقفنا… 🔒</div>
+    <div style="color:#2d6a4f;font-size:0.82rem;line-height:1.7;margin-bottom:14px" id="pwSub">الكتاب الكامل فيه بزاف أكثر.<br>خلص عبر RIB وبعث screenshot على WhatsApp.</div>
+    <div style="background:#e8f4ec;border:1px solid rgba(45,106,79,0.2);border-radius:10px;padding:14px;margin-bottom:12px">
+      <div style="font-size:0.7rem;color:#2d6a4f;font-weight:700;letter-spacing:1px;margin-bottom:6px">RIB – Attijariwafa Bank</div>
+      <div style="background:#fff;border:1px solid rgba(45,106,79,0.15);border-radius:6px;padding:8px 12px;font-family:monospace;font-size:0.82rem;color:#1a1008;direction:ltr;word-break:break-all;margin-bottom:6px">00748000063953004005781</div>
+      <div style="font-size:1.05rem;font-weight:700;color:#2d6a4f">9$ ≈ 90 DH</div>
+    </div>
+    <a href="https://wa.me/212635924374?text=%D9%85%D8%B1%D8%AD%D8%A8%D8%A7%D8%8C%20%D8%A8%D8%BA%D9%8A%D8%AA%20%D9%86%D8%B4%D8%B1%D9%8A%20%D8%A7%D9%84%D9%83%D8%AA%D8%A7%D8%A8%20%D8%A7%D9%84%D9%83%D8%A7%D9%85%D9%84" target="_blank" style="display:inline-flex;align-items:center;gap:8px;padding:11px 22px;background:#25D366;color:#fff;border-radius:8px;text-decoration:none;font-family:'Cairo',sans-serif;font-weight:700;font-size:0.88rem;margin-bottom:14px">💬 تواصل على WhatsApp</a>
+    <br>
+    <button onclick="goBack()" style="background:rgba(27,94,59,0.08);border:1px solid rgba(27,94,59,0.2);color:#1b5e3b;font-size:0.88rem;cursor:pointer;font-family:'Cairo',sans-serif;padding:8px 18px;border-radius:8px;display:flex;align-items:center;gap:6px;margin:0 auto 12px;font-weight:600;">&#8594; رجوع للصفحة السابقة</button>
+    <div style="font-size:0.72rem;color:#aaa;margin-bottom:10px">— أو عندك كود؟ —</div>
+    <input type="text" id="codeInput" placeholder="أدخل كود الدخول" maxlength="12" dir="ltr" style="width:100%;padding:11px;background:#e8f4ec;border:1px solid rgba(45,106,79,0.2);border-radius:8px;color:#1a1008;font-size:1rem;text-align:center;letter-spacing:3px;font-family:'Cairo',sans-serif;outline:none;margin-bottom:8px">
+    <button onclick="checkCode()" style="width:100%;padding:11px;background:linear-gradient(135deg,#1b4332,#40916c);color:#fff;font-weight:700;font-size:0.95rem;border:none;border-radius:8px;cursor:pointer;font-family:'Cairo',sans-serif">دخول بالكود</button>
+    <div class="modal-error" id="codeError"></div>
+  </div>
+</div>
+<script>function goBack(){
+  document.getElementById('pwModal').style.display='none';
+  pg = FREE - 1;
+  renderPage(pg);
+}
+function showPwModal(){
+  const m=document.getElementById('pwModal');
+  m.style.display='flex';
+  m.style.alignItems='center';
+  m.style.justifyContent='center';
+}</script>
+</body>
+</html>
